@@ -57,7 +57,8 @@ void setup()
 	softSerial.begin(SERIAL_SPEED);
 	SetupGps();
 	Serial.begin(SERIAL_SPEED);
-	
+	/*snd.Volume = LOWSOUNDVOLUME;
+	snd.BaseFreq = config.BaseFreq/4;*/
 }
 
 #ifdef DEBUG && VARIO_SOUND_TEST
@@ -66,7 +67,7 @@ int vario = 0 ;
 
 void loop() {
 	readSensors(); //Executive part that reads all sensor values and process them  
-	 
+
 #ifdef DEBUG && VARIO_SOUND_TEST
 	snd.VarioSound(vario);
 	OutputToSerial();
@@ -238,28 +239,20 @@ void readSensors() {
 //=====================================================================================================
 void OnDblClick(int pin) {
 #ifdef DEBUG && VARIO_SOUND_TEST VARIO_SOUND_TEST
-	//vario = 0;
 	vario = vario-20;
-	
 	return;
 #endif
 
 	snd.SetSound(!snd.SoundOn);
 }
+
 int ii = 0;
 void OnClick(int pin)
 { 
-	snd.Sonar(1);
-	delay(1500);
-	snd.Sonar(2);
-	delay(1500);
-	snd.Sonar(3);
-	return;
-
-	snd.PlayLKSound(ii);
-	if (ii>9) {ii=0;return;}
+	/*snd.PlayLKSound(ii);
+	if (ii>17) {ii=0;return;}
 	ii++;
-	return;
+	return;*/
 
 #ifdef DEBUG && VARIO_SOUND_TEST VARIO_SOUND_TEST
 	vario = vario+20;
@@ -270,18 +263,20 @@ void OnClick(int pin)
 	{
 		snd.SetSound(true);
 		return;
+		EEPROM_writeAnything(0, config);
 	}
 
 	if (snd.Volume == 10)	
 	{
 		snd.Volume = LOWSOUNDVOLUME;
 		snd.BaseFreq = config.BaseFreq/4;
-		snd.SoundUp();
+		snd.SoundUp2();
 	}else{
 		snd.Volume = 10;
 		snd.BaseFreq = config.BaseFreq;
-		snd.SoundUp();
+		snd.SoundUp2();
 	}
+	EEPROM_writeAnything(0, config);
 }
 
 void VLongPress(int pin)
@@ -308,10 +303,10 @@ void SetMode(byte m)
 	if (config.Mode > 2 || config.Mode < 0) 
 	{
 		config.Mode = 1;
-		snd.SoundUp();
+		snd.SoundUp2();
 	}else{
-	    snd.SoundUp();
-		snd.SoundUp();
+	    snd.SoundUp2();
+		snd.SoundUp2();
 	}
 
 #ifndef AIRSPEED  // step over dte vario mode if no airspeed sensor

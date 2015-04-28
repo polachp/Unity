@@ -40,6 +40,13 @@ void Sounds::VarioSound(int32_t climbRate) {
 bool accSignalized= false;
 void Sounds::basic(int32_t climbRate) {
 
+	/*if ( climbRate <=100  )
+	{
+	toneAC(freq,Volume, 5000,true);
+
+	return;
+	}*/
+
 	if (((_tempo - beep) > cadence) && SoundOn)                      // make some beep
 	{
 		startBeep = millis();
@@ -118,6 +125,24 @@ void Sounds::Play(int note, int ms) {
 	toneAC(note, Volume, ms, true);
 }
 
+void Sounds::SlideSound(int start,int high,int raiseStep,int delayTime){
+	if (start<high)
+	{
+		for (int aa = start; aa <= high ; aa = aa + raiseStep)
+		{
+			toneAC( aa, 5000);      
+			delay(delayTime);
+		}
+	}else{
+		for (int aa = high; aa >= start ; aa = aa - raiseStep)
+		{
+			toneAC( aa, 5000);      
+			delay(delayTime);
+		}
+	}
+	noToneAC();
+}
+
 void Sounds::SoundUp()                 //play only once welcome beep after turning on arduino vario
 {
 	for (int aa = 1000; aa <= 2600; aa = aa + 25)
@@ -167,26 +192,20 @@ void Sounds::Alarm(byte rings) {
 	{
 		for (int aa = 300; aa <= 1000; aa = aa + 100)
 		{
-			toneAC( aa, 60);         // play beep on pin 9 (note,duration), it is louder if we move aplitude phase
+			toneAC( aa, 60);     
 			delay(15);
 		}
 	}
 	noToneAC();
 }
 
-void Sounds::Sonar(int repeat) 
-{
-	for (int i = 0; i < repeat; i++)
-	{
-		for (int aa = 50; aa <= 3500; aa = aa + 130)
-		{
-			toneAC( aa, 60);         // play beep on pin 9 (note,duration), it is louder if we move aplitude phase
-			delay(1);
-		}
-		delay(100);
-	}
-	noToneAC();
+void Sounds::Sonar(int level) 
+{  
+	int freq = 3900+(level*80);
+	toneAC( freq,100);delay(80+(level*15));
+	SlideSound( freq, 6000, 60, 1);
 }
+
 
 void Sounds::PlayLKSound(int soundCode){
 	switch (soundCode)
@@ -237,8 +256,21 @@ void Sounds::PlayLKSound(int soundCode){
 		break;
 
 	case 13:
-		//Alarm(6);
+		Sonar(1);
 		break;
+	case 14:
+		Sonar(2);
+		break;
+	case 15:
+		Sonar(3);
+		break;
+	case 16:
+		Sonar(4);
+		break;
+	case 17:
+		Sonar(5);
+		break;
+
 	default:
 		Alarm(1);
 		break;

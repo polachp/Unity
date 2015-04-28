@@ -21,7 +21,8 @@ private:
 	unsigned long    cadence;
 	int32_t vario_climb_rate_start;
 	int32_t vario_sink_rate_start ;
-	void simpLinReg(int* x, int* y, float* lrCoef, int n);
+	void SlideSound(int start,int high,int raiseStep,int delayTime);
+
 public:
 
 	Sounds();
