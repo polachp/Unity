@@ -66,7 +66,7 @@ int vario = 0 ;
 
 void loop() {
 	readSensors(); //Executive part that reads all sensor values and process them  
-
+	 
 #ifdef DEBUG && VARIO_SOUND_TEST
 	snd.VarioSound(vario);
 	OutputToSerial();

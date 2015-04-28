@@ -40,13 +40,6 @@ void Sounds::VarioSound(int32_t climbRate) {
 bool accSignalized= false;
 void Sounds::basic(int32_t climbRate) {
 
-	/*if ( climbRate <=100  )
-	{
-	toneAC(freq,Volume, 5000,true);
-
-	return;
-	}*/
-
 	if (((_tempo - beep) > cadence) && SoundOn)                      // make some beep
 	{
 		startBeep = millis();
