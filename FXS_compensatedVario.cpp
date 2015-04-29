@@ -10,7 +10,7 @@ FXS_CompensatedVario::FXS_CompensatedVario()
 void FXS_CompensatedVario::CalculateDte ()
 {
   rawCompensation = 3078.25 * airspd.airSpeedData.difPressureAdc_zero * airspd.airSpeedData.temperature4525  /  actualPressure; // 3078.25 = comp = 2 * 287.05 / 2 / 9.81 * 1.0520 * 100 * Temp / Pressure
-  rawTotalEnergy = (baro.varioData.rawAltitude * 0.01) + rawCompensation * 0.0120; // 0.01 means 100% compensation but we add 20% because it seems that it is 20% undercompensated.
+  rawTotalEnergy = (baro.varioData.rawAltitude * 0.01) + rawCompensation * 0.0130; // 0.01 means 100% compensation but we add 20% because it seems that it is 20% undercompensated.
 
   if (totalEnergyLowPass == 0) {
     totalEnergyLowPass = totalEnergyHighPass = rawTotalEnergy;

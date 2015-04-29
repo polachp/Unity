@@ -27,7 +27,7 @@ String gpsData="";
 String koboData="";
 Sounds snd;
 Configuration config;
-TinyGPS gps;
+//TinyGPS gps;
 MS5611 baro(I2C_MS5611_Add);
 #ifdef AIRSPEED // differential pressure
 MS4525  airspd(I2C_4525_Add);
@@ -159,10 +159,10 @@ void send_cmd(Stream &icf, String &cmd) {
 void SetupGps(){
 	String cmd = "";
 
-	cmd = "PMTK869,1,1"; 
+	//cmd = "PMTK869,1,1"; 
 	send_cmd(softSerial,cmd);
-	cmd = "PMTK314,0,1,1,1,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0"; 
-	//cmd = "PMTK314,0,1,0,1,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0"; 
+	//cmd = "PMTK314,0,1,1,1,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0"; with speed sentence
+	cmd = "PMTK314,0,1,0,1,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0"; //without speed sentences
 	send_cmd(softSerial, cmd);
 	cmd = "PMTK220,500";  
 	send_cmd(softSerial, cmd); //set default 500ms per fix
@@ -170,13 +170,12 @@ void SetupGps(){
 	//Serial.begin(GPS_SERIAL_SPEED);
 }
 
-
 void ProcessGPS()
 { 
 	while (Serial.available())
 	{
 		char in = Serial.read();
-		gps.encode(in);
+		//gps.encode(in);
 		if (in == '$') {
 			Serial.println(gpsData);
 			gpsData = "$";

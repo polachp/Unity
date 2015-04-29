@@ -83,5 +83,8 @@
     <ClInclude Include="TinyGPS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Visual Micro\._PROJECT.vsarduino.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
