@@ -160,13 +160,30 @@ void SetupGps(){
 	String cmd = "";
 
 	//cmd = "PMTK869,1,1"; 
-	send_cmd(softSerial,cmd);
+	//send_cmd(softSerial,cmd);
+	
 	//cmd = "PMTK314,0,1,1,1,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0"; with speed sentence
-	cmd = "PMTK314,0,1,0,1,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0"; //without speed sentences
+	
+	cmd = "PMTK314,0,1,0,1,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0"; //without speed sentences
 	send_cmd(softSerial, cmd);
-	cmd = "PMTK220,500";  
-	send_cmd(softSerial, cmd); //set default 500ms per fix
-	//cmd = "PMTK251,57600"; send_cmd(softSerial, cmd);
+	
+	cmd = "PMTK220,250";  
+	send_cmd(softSerial, cmd);
+	
+	cmd = "PMTK225,0"; 
+	send_cmd(softSerial, cmd);
+
+	cmd = "PMTK301,2";  //sbas
+	send_cmd(softSerial, cmd);
+	
+	cmd = "PMTK313,1"; //waas
+	send_cmd(softSerial, cmd);
+
+	cmd = "PMTK513,1"; //waas
+	send_cmd(softSerial, cmd);
+
+	cmd = "PMTK313,1"; //waas
+	send_cmd(softSerial, cmd);
 	//Serial.begin(GPS_SERIAL_SPEED);
 }
 
