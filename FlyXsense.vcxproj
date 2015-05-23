@@ -78,6 +78,7 @@
   <ItemGroup>
     <ClCompile Include="FXS_Button.cpp" />
     <ClCompile Include="FXS_compensatedVario.cpp" />
+    <ClCompile Include="FXS_config.cpp" />
     <ClCompile Include="FXS_I2C.cpp" />
     <ClCompile Include="FXS_KalmanFilter.cpp" />
     <ClCompile Include="FXS_ms4525.cpp" />
@@ -87,6 +88,7 @@
     <ClCompile Include="TinyGPS.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DefaultValues.h" />
     <ClInclude Include="FXS_Button.h">
       <FileType>CppCode</FileType>
     </ClInclude>

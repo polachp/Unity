@@ -1,0 +1,48 @@
+[_setup_]
+port=COM7  
+baudrate=115200
+
+width=3000
+height=401
+background_color = white
+
+grid_h_origin = 200
+grid_h_step = 20
+grid_h_color = #EEE
+grid_h_origin_color = #CCC
+
+grid_v_origin = 0
+grid_v_step = 20
+grid_v_color = #EEE
+grid_v_origin_color = transparent
+
+[_default_]
+min=-2
+max=2
+
+[spedSM]
+color=cyan
+min=0
+max=200
+
+[cr]
+color=blue
+dash=3
+
+[crSM]
+color=transparent
+dash=5
+
+[heigth]
+color=green
+min=566
+max=574
+
+[crCOMP]
+color=red
+
+
+
+
+
+
