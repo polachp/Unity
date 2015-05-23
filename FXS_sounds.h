@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include "FXS_toneAC.h"
-#include "FXS_config.h"
+#include "DefaultValues.h"
 #include <stdlib.h>
 
 
@@ -11,7 +11,7 @@
 class Sounds
 {
 private:
-	unsigned long _tempo;
+	unsigned long _now;
 	void basic(int32_t climbRate);
 	int lowSound(int32_t climbRate);
 	int period(int32_t climbRate);
@@ -22,6 +22,7 @@ private:
 	int32_t vario_climb_rate_start;
 	int32_t vario_sink_rate_start ;
 	void SlideSound(int start,int high,int raiseStep,int delayTime);
+	int32_t CompensationFreqVarioStartRate;
 
 public:
 
@@ -29,7 +30,7 @@ public:
 	boolean SoundOn;
 	int BaseFreq;
 	uint8_t Volume;
-    void Setup(int32_t climb_rate_start, int32_t sink_rate_start);
+	void Setup(int32_t climb_rate_start, int32_t sink_rate_start);
 	void SetSound(boolean enabled);
 	void VarioSound(int32_t climbRate);
 

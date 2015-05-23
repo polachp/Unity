@@ -85,8 +85,6 @@
 #define MAX_BUFFER_SIZE 32
 
 
-
-
 class I2C
 {
   public:

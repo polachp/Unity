@@ -1,7 +1,7 @@
 #ifndef FXS_COMPENSATEDVARIO_h
 #define FXS_COMPENSATEDVARIO_h
 
-#include "FXS_config.h"
+#include "DefaultValues.h"
 #include "FXS_ms5611.h"
 #include "FXS_ms4525.h"
 
@@ -28,8 +28,6 @@ class FXS_CompensatedVario
     FXS_CompensatedVario();
     void CalculateDte();
 };
-
-
 
 
 #endif //fXv_COMPENSATEDVARIO_h

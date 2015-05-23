@@ -2,22 +2,24 @@
 //Fly X Sense project
 //=====================================================================================================
 
-//#define DEBUG
+#define DEBUG
 //#define VARIO_SOUND_TEST
 //#define DEBUGCOMPENSATEDCLIMBRATE
 //#define DEBUGOUTDATATOSERIAL
 
 #include <Arduino.h>
+
 #include <SoftwareSerial.h>
 #include <HardwareSerial.h>
 #include <EEPROM.h>
-#include "FXS_config.h"
+#include "FXS_EEPROMAnything.h"
+#include "DefaultValues.h"
 #include "FXS_ms5611.h"
 #include "FXS_ms4525.h"
+#include "FXS_config.h"
 #include "FXS_sounds.h"
 #include "FXS_Button.h"
 #include "FXS_CompensatedVario.h"
-#include "FXS_EEPROMAnything.h"
 #include "TinyGPS.h"
 
 float actualPressure;
@@ -26,53 +28,73 @@ SoftwareSerial softSerial(7,8); // RX, TX
 String gpsData="";
 String koboData="";
 Sounds snd;
-Configuration config;
-//TinyGPS gps;
+ConfigManager config;
 MS5611 baro(I2C_MS5611_Add);
 
 #ifdef AIRSPEED // differential pressure
+#define ALLOWMODESWITCH
 MS4525  airspd(I2C_4525_Add);
 FXS_CompensatedVario dteVario;
 #endif
 
+#ifdef VARIO_SOUND_TEST
+int vario = 0 ;
+#endif
 //loop timers
 unsigned long nextVarioDataUpdateMillis = 5000;
 unsigned long nextGpsOutputTimeMillis = 5000;
 
 void setup()
 {
-	LoadConfig();
+
 	button.Configure(BUTTONPIN);
 	button.OnClick = OnClick;
 	button.OnLongPress= OnLongClick;
 	button.OnVLongPress = VLongPress;
 	button.OnDblClick = OnDblClick;
 
+	//reset if holding button
+	int i = 0;
+	while (digitalRead(BUTTONPIN) == LOW)
+	{
+		i++;
+		snd.Play(700,1000);
+		delay(50*i);
+		noToneAC();
+		delay(1000-i*50);
+		if(i>=15) 
+		{
+			snd.SoundUp2();
+			snd.SoundUp2();
+			snd.SoundUp2(); 
+			snd.SoundUp2();
+			//ConfigManager.con	SetDefaults();
+			break;
+		}
+	}
+
+
 	baro.setup();
 #ifdef AIRSPEED
 	airspd.setup();
 #endif
-
 	actualPressure = 101325;
-
 	softSerial.begin(SERIAL_SPEED);
 	SetupGps();
-	Serial.begin(SERIAL_SPEED);
+	Serial.begin( SERIAL_SPEED);
+	config.LoadConfigToRuntime();
+	configPrint(config.data);
 }
-
-#ifdef DEBUG && VARIO_SOUND_TEST
-int vario = 0 ;
-#endif
 
 void loop() {
 	readSensors(); //Executive part that reads all sensor values and process them  
-	
-#ifdef DEBUG && VARIO_SOUND_TEST
+
+#ifdef VARIO_SOUND_TEST
 	snd.VarioSound(vario);
-	OutputToSerial();
+	//OutputToSerial();
 #else
 #ifdef AIRSPEED
-	if (baro.varioData.climbRateAvailable && dteVario.compensatedClimbRateAvailable && config.Mode == 1)
+	if (baro.varioData.climbRateAvailable && dteVario.compensatedClimbRateAvailable && config.data.VarioMode == 1)
 		snd.VarioSound( dteVario.compensatedClimbRate);
 	else
 		snd.VarioSound(baro.varioData.climbRate);
@@ -81,16 +103,16 @@ void loop() {
 #endif
 #endif
 
-#ifndef DEBUG
+//#ifndef DEBUG
 	ProcessGPS();
 
 	if ((millis() - nextVarioDataUpdateMillis) > VARIODATASENDINTERVAL)
 	{
-		SendVarioData();
+		//SendVarioData();
 		ProcessKobo();
 		nextVarioDataUpdateMillis = millis();
 	}
-#endif
+//#endif
 	button.CheckBP();
 }// LOOP
 
@@ -123,7 +145,7 @@ void SendVarioData()
 	for (int i = 0; i < 6; i++)
 	{
 #ifdef AIRSPEED
-		if (baro.varioData.climbRateAvailable && dteVario.compensatedClimbRateAvailable && config.Mode == 1)
+		if (baro.varioData.climbRateAvailable && dteVario.compensatedClimbRateAvailable && config.data.VarioMode == compensated)
 		{
 			varioData.concat((float)dteVario.compensatedClimbRate / 100);
 		}
@@ -190,7 +212,6 @@ void ProcessGPS()
 	while (Serial.available())
 	{
 		char in = Serial.read();
-		//gps.encode(in);
 		if (in == '$') {
 			Serial.println(gpsData);
 			gpsData = "$";
@@ -206,9 +227,8 @@ void ProcessKobo()
 	while (softSerial.available())
 	{
 		char in = softSerial.read();
-		Serial.println(in);
 		if (in == '$') {
-			if (Contains(koboData,"UNITY_SOUND"))
+			if (Contains(koboData,"UNS"))
 			{
 				snd.PlayLKSound(GetValueFromSoundNMEA(koboData));
 			}
@@ -233,7 +253,7 @@ bool Contains(String s, String search) {
 
 void readSensors() {
 #ifdef AIRSPEED
-	if(dteVario.compensatedClimbRateAvailable && config.Mode == 1) // read speed sensor twice only for vario compensated mode purposes
+	if(dteVario.compensatedClimbRateAvailable && config.data.VarioMode == 1) // read speed sensor twice only for vario compensated mode purposes
 	{
 		airspd.readSensor();
 	}
@@ -256,72 +276,70 @@ void readSensors() {
 //button handlers section
 //=====================================================================================================
 void OnDblClick(int pin) {
-#ifdef DEBUG && VARIO_SOUND_TEST VARIO_SOUND_TEST
+#ifdef VARIO_SOUND_TEST
 	vario = 0;
+	Serial.println(0);
 	return;
 #endif
-
 	snd.SetSound(!snd.SoundOn);
+	config.data.SoundOn = false;
+	EEPROM_writeAnything(0, config.data);
 }
 
 int ii = 0;
 void OnClick(int pin)
 { 
+#ifdef VARIO_SOUND_TEST
 	/*snd.PlayLKSound(ii);
 	if (ii>17) {ii=0;return;}
 	ii++;
 	return;*/
 
-#ifdef DEBUG && VARIO_SOUND_TEST VARIO_SOUND_TEST
 	vario = vario+20;
+	Serial.println(vario/100.0);
 	return;
+
 #endif
 
 	if (!snd.SoundOn) 
 	{
 		snd.SetSound(true);
+		config.data.SoundOn =true;
+		EEPROM_writeAnything(0, config.data);
 		return;
-		EEPROM_writeAnything(0, config);
 	}
 
 	if (snd.Volume == 10)	
 	{
-		snd.Volume = LOWSOUNDVOLUME;
-		snd.BaseFreq = config.BaseFreq*LOWSOUNVOLUMEFREQMULTIPLIER;
+		snd.Volume = config.data.LowSoundVolume;
+		snd.BaseFreq = config.data.LowBaseFreq;
 		snd.SoundDn2();
 	}else{
 		snd.Volume = 10;
-		snd.BaseFreq = config.BaseFreq;
+		snd.BaseFreq =config. data.BaseFreq;
 		snd.SoundUp2();
 	}
-	EEPROM_writeAnything(0, config);
+
+	config.data.Volume=snd.Volume;
+	EEPROM_writeAnything(0,config.data);
 }
 
 void OnLongClick(int pin)
 {
-	SetMode(config.Mode++);
-}
-
-void SetMode(byte m)
-{
-	if (config.Mode > 2 || config.Mode < 0) 
+#ifdef ALLOWMODESWITCH
+	if (config.data.VarioMode==compensated)
 	{
-		config.Mode = 1;
-		snd.SoundUp2();
-	}else{
-		snd.SoundUp2();
-		snd.SoundUp2();
+		config.SetVarioMode(normal);
 	}
-
-#ifndef AIRSPEED  // step over dte vario mode if no airspeed sensor
-	if (config.Mode == 1) config.Mode++;
+	else{
+		config.	SetVarioMode(compensated);
+	}
 #endif
-
-	EEPROM_writeAnything(0, config);
 }
 
 void VLongPress(int pin)
 {
+#ifdef AIRSPEED
 	//airspeeed sensor for proper null airspeed
 	snd.Play(600,200);
 	delay(500);
@@ -332,39 +350,52 @@ void VLongPress(int pin)
 	airspd.airSpeedData.airspeedReset=true;
 	delay(200);
 	noToneAC();
+#endif
 }
 
-void LoadConfig()
-{
-	EEPROM_readAnything(0, config);
-	if (config.SchemaVersion != SCHEMAVERSION )
-	{
-		SetDefaults();
-	}
-	snd.SoundOn = config.SoundOn;
-	snd.Volume = config.Volume;
-	if (snd.Volume<10) snd.BaseFreq = config.BaseFreq*LOWSOUNVOLUMEFREQMULTIPLIER;
-	SetMode(config.Mode);
-}
 
-void SetDefaults()
-{
-	config.SchemaVersion = SCHEMAVERSION;
-	config.Mode = 1;
-	config.SoundOn = true;
-	config.BaseFreq = DEFAULTSOUNDBASEFREQ;
-	config.SpeedCalibrationA= SPEEDCALIBRATION_A;
-	config.SpeedCalibrationB= SPEEDCALIBRATION_B;
-	config.VarioClimbRateStart = CLIMBSOUNDTRESHOLD;
-	config.VarioSinkRateStart = SINKSOUNDTRESHOLD;
-	config.Volume = 100;
-	EEPROM_writeAnything(0, config);
-}
+
 
 #ifdef DEBUG
+void configPrint(Configuration conf)
+{
+	Serial.print("schema:");
+	Serial.println(conf.SchemaVersion);
+
+	Serial.print("mode:");
+	Serial.println(conf.VarioMode);
+
+	Serial.print("soundon:");
+	Serial.println(conf.SoundOn);
+
+	Serial.print("basefreq:");
+	Serial.println(conf.BaseFreq);
+
+	Serial.print("lowbasefreq:");
+	Serial.println(conf.LowBaseFreq);
+
+	Serial.print("LowSoundVolume:");
+	Serial.println(conf.LowSoundVolume);
+
+	Serial.print("Volume:");
+	Serial.println(conf.Volume);
+
+	Serial.print("LiftTreshold:");
+	Serial.println(conf.LiftTreshold);
+
+	Serial.print("SinkTreshold:");
+	Serial.println(conf.SinkTreshold);
+
+	Serial.print("SpeedCalibrationA:");
+	Serial.println(conf.SpeedCalibrationA);
+	Serial.print("SpeedCalibrationB:");
+	Serial.println(conf.SpeedCalibrationB);
+
+}
 //used for debuging and testing
 void OutputToSerial()
 {
+	return;
 	//Serial.print( airspd.airSpeedData.airSpeed * 3.6/100);
 	//Serial.print(F(","));
 	Serial.print( airspd.airSpeedData.airSpeed * 3.6 / 100);

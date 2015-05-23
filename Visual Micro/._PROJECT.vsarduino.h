@@ -40,6 +40,7 @@ typedef unsigned char byte;
 extern "C" void __cxa_pure_virtual() {;}
 #include "c:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino\arduino.h"
 #include "c:\Program Files (x86)\Arduino\hardware\arduino\avr\variants\eightanaloginputs\pins_arduino.h" 
+#include "C:\_PROJECT\DefaultValues.h"
 #include "C:\_PROJECT\FXS_Button.cpp"
 #include "C:\_PROJECT\FXS_Button.h"
 #include "C:\_PROJECT\FXS_CompensatedVario.h"
@@ -50,6 +51,7 @@ extern "C" void __cxa_pure_virtual() {;}
 #include "C:\_PROJECT\FXS_KalmanFilter.h"
 #include "C:\_PROJECT\FXS_Sounds.cpp"
 #include "C:\_PROJECT\FXS_compensatedVario.cpp"
+#include "C:\_PROJECT\FXS_config.cpp"
 #include "C:\_PROJECT\FXS_config.h"
 #include "C:\_PROJECT\FXS_ms4525.cpp"
 #include "C:\_PROJECT\FXS_ms4525.h"

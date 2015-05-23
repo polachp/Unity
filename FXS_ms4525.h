@@ -2,7 +2,7 @@
 #define FXS_MS4525_h
 
 #include <Arduino.h>
-#include "FXS_config.h"
+//#include "FXS_config.h"
 #include "FXS_I2C.h"
 #include "FXS_KalmanFilter.h"
 
@@ -29,12 +29,15 @@ extern float actualPressure ;
 
 class MS4525 {
   public:
-    MS4525(uint8_t addr);
+	MS4525(uint8_t addr);
     AIRSPEEDDATA airSpeedData ;
     void setup();
-    void  readSensor();
+	void setCalibration(int a,int b);
+    void readSensor();
 
   private:
+	float calib_A;
+	float calib_B;
     KalmanFilter   kalmanAirspeedSM;
     void SendCommand(byte command);
     uint8_t _addr;
@@ -62,13 +65,12 @@ class MS4525 {
 #endif
 }; // end class MS4525
 
-extern int32_t test1Value ;// used in order to test the transmission of any value
-extern bool test1ValueAvailable ;
-extern int32_t test2Value ;// used in order to test the transmission of any value
-extern bool test2ValueAvailable ;
-extern int32_t test3Value ;// used in order to test the transmission of any value
-extern bool test3ValueAvailable ;
-
+//extern int32_t test1Value ;// used in order to test the transmission of any value
+//extern bool test1ValueAvailable ;
+//extern int32_t test2Value ;// used in order to test the transmission of any value
+//extern bool test2ValueAvailable ;
+//extern int32_t test3Value ;// used in order to test the transmission of any value
+//extern bool test3ValueAvailable ;
 
 #endif // MS4525
 

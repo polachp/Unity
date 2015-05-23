@@ -1,9 +1,9 @@
-#ifndef MS5611_h
-#define MS5611_h
+#ifndef FXS_MS5611_h
+#define FXS_MS5611_h
 
 
 #include "Arduino.h"
-#include "FXS_config.h"
+#include "DefaultValues.h"
 #include "FXS_I2C.h"
 #include "FXS_KalmanFilter.h"
 

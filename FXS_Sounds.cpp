@@ -4,14 +4,15 @@ Sounds::Sounds()
 { 
 	SoundOn = true;
 	Volume = 10;
-	vario_climb_rate_start = CLIMBSOUNDTRESHOLD;
-	vario_sink_rate_start = SINKSOUNDTRESHOLD;
+	vario_climb_rate_start = DEFAULT_LIFT_TRESHOLD;
+	vario_sink_rate_start = DEFAULT_SINK_TRESHOLD;
 	BaseFreq= DEFAULTSOUNDBASEFREQ;
 }
 
 void Sounds::Setup(int32_t climb_rate_start, int32_t sink_rate_start) {
 	vario_climb_rate_start = climb_rate_start;
 	vario_sink_rate_start = sink_rate_start;
+	CompensationFreqVarioStartRate = 	CompensationFreqVarioStartRate * vario_climb_rate_start*vario_climb_rate_start;
 }
 
 void Sounds::SetSound(boolean enabled) {
@@ -31,36 +32,37 @@ unsigned long freqShift = 0;
 unsigned long startBeep = 0;
 unsigned long endBeep = 0;
 
-int32_t lastclimbrate=0;
-
 void Sounds::VarioSound(int32_t climbRate) {
-	_tempo = millis();
 	basic(climbRate);
 }
-bool accSignalized= false;
-void Sounds::basic(int32_t climbRate) {
 
+void Sounds::basic(int32_t climbRate) {
+	_now = millis();
 	/*if ( climbRate <=100  )
 	{
 	toneAC(freq,Volume, 5000,true);
-
 	return;
 	}*/
 
-	if (((_tempo - beep) > cadence) && SoundOn)                      // make some beep
+	if (((_now - beep) > cadence) && SoundOn)   
 	{
 		startBeep = millis();
-		beep = _tempo;
+		beep = _now;
 		if (climbRate >= vario_climb_rate_start)
 		{
 			i=0;
 			freqShift=0;
 			cadence = period(climbRate);
 			endBeep = millis() + length(climbRate);
-			freq = BaseFreq + ((climbRate*climbRate)-(vario_climb_rate_start*vario_climb_rate_start))/250; 
-			if (freq > BaseFreq +400) 
-				freq = BaseFreq+400;
-			toneAC(freq,Volume, 5000,true);
+
+		/*	Serial.print(climbRate/100.0);
+			Serial.print("  ");
+			Serial.print(freq);
+			Serial.print("  ");
+			Serial.print(length(climbRate));
+			Serial.print("  ");
+			Serial.print(period(climbRate));
+			Serial.println();*/
 		}
 	}
 	else
@@ -75,18 +77,17 @@ void Sounds::basic(int32_t climbRate) {
 
 		// this makes sound more "plastic"
 		if (millis() < endBeep  && climbRate >= vario_climb_rate_start)
-		{
-			if ( climbRate <=100 && i%2==0)//100  )
+		{   
+			i++;
+			if (climbRate <=100 && i%6==0)
 			{
 				freqShift=freqShift+1;
-				i++;
 			}
-			freq = (BaseFreq + ((climbRate*climbRate)-(vario_climb_rate_start*vario_climb_rate_start))/250)+freqShift;
+			freq= map(climbRate,0,800,BaseFreq,BaseFreq+800);
 			toneAC(freq+freqShift,Volume, 5000,true);
 		}
 		else{
 			noToneAC();
-			accSignalized=true;
 		}
 	}
 }
@@ -101,17 +102,18 @@ int Sounds::lowSound(int32_t climbRate) {
 }
 
 int Sounds::period(int32_t climbRate) {
-	int minPer = 140;
-	int value =((1.5f/(climbRate+50))*40000)*0.9*DEFAULTSOUNDSPEEDFACTOR;
+	int minPer = 70;
+	int value =((1.3f/(climbRate+50))*40000)*DEFAULTSOUNDSPEEDFACTOR;
 	if (value < minPer)
 		return minPer;
 	else
 		return value*DEFAULTSOUNDSPEEDFACTOR;
 }
 
+int minLength = 50;
 int Sounds::length(int32_t climbRate) {
-	int minLength = 60;
-	int value =(1.0f/(climbRate+90))*45000*DEFAULTSOUNDSPEEDFACTOR; 
+
+	int value =(1.5f/(climbRate+80))*30000*DEFAULTSOUNDSPEEDFACTOR; 
 	if (value < minLength)
 		return minLength;
 	else
@@ -276,8 +278,3 @@ void Sounds::PlayLKSound(int soundCode){
 		break;
 	}
 }
-
-
-
-
-

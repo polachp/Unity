@@ -1,5 +1,5 @@
-#ifndef FXS_KalmanFilter_h
-#define FXS_KalmanFilter_h
+#ifndef FXS_KALMANFILTER_h
+#define FXS_KALMANFILTER_h
 
 class KalmanFilter
 {
