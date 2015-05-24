@@ -6,8 +6,6 @@
 #include "DefaultValues.h"
 #include <stdlib.h>
 
-
-
 class Sounds
 {
 private:
@@ -17,8 +15,8 @@ private:
 	int period(int32_t climbRate);
 	int length(int32_t climbRate);
 	int freq;
-	unsigned long    beep;
-	unsigned long    cadence;
+	unsigned long  beep;
+	unsigned long  cadence;
 	int32_t vario_climb_rate_start;
 	int32_t vario_sink_rate_start ;
 	void SlideSound(int start,int high,int raiseStep,int delayTime);

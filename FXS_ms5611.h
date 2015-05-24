@@ -1,7 +1,6 @@
 #ifndef FXS_MS5611_h
 #define FXS_MS5611_h
 
-
 #include "Arduino.h"
 #include "DefaultValues.h"
 #include "FXS_I2C.h"
@@ -39,7 +38,7 @@ class MS5611 {
     void resetValues();
 
   private:
-     KalmanFilter  kalmanVario;
+    KalmanFilter  kalmanVario;
     long result ;
     uint8_t _addr;
     unsigned int _calibrationData[7]; // The factory calibration data of the ms5611

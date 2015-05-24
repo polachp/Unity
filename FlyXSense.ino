@@ -2,7 +2,7 @@
 //Fly X Sense project
 //=====================================================================================================
 
-#define DEBUG
+//#define DEBUG
 //#define VARIO_SOUND_TEST
 //#define DEBUGCOMPENSATEDCLIMBRATE
 //#define DEBUGOUTDATATOSERIAL
@@ -62,28 +62,26 @@ void setup()
 		delay(50*i);
 		noToneAC();
 		delay(1000-i*50);
-		if(i>=15) 
+		if(i>=10) 
 		{
 			snd.SoundUp2();
 			snd.SoundUp2();
 			snd.SoundUp2(); 
 			snd.SoundUp2();
-			//ConfigManager.con	SetDefaults();
+			config.SetDefaults();
 			break;
 		}
 	}
-
-
+	actualPressure = 101325;
 	baro.setup();
 #ifdef AIRSPEED
 	airspd.setup();
 #endif
-	actualPressure = 101325;
+	config.LoadConfigToRuntime();
 	softSerial.begin(SERIAL_SPEED);
 	SetupGps();
-	Serial.begin( SERIAL_SPEED);
-	config.LoadConfigToRuntime();
-	configPrint(config.data);
+	Serial.begin(SERIAL_SPEED);
+	config.Print(Serial);
 }
 
 void loop() {
@@ -103,19 +101,19 @@ void loop() {
 #endif
 #endif
 
-//#ifndef DEBUG
+	ProcessKobo();
+#ifndef DEBUG
 	ProcessGPS();
-
+	
 	if ((millis() - nextVarioDataUpdateMillis) > VARIODATASENDINTERVAL)
 	{
-		//SendVarioData();
-		ProcessKobo();
+		SendVarioData();
 		nextVarioDataUpdateMillis = millis();
 	}
-//#endif
+#endif
 	button.CheckBP();
+	
 }// LOOP
-
 
 // $LXWP0,logger_stored, airspeed, airaltitude,
 //   v1[0],v1[1],v1[2],v1[3],v1[4],v1[5], hdg, windspeed*CS<CR><LF>
@@ -130,7 +128,6 @@ void loop() {
 //
 // e.g.:
 // $LXWP0,Y,222.3,1665.5,1.71,,,,,,239,174,10.1
-
 String varioData = "";
 void SendVarioData()
 {
@@ -222,29 +219,25 @@ void ProcessGPS()
 	}
 }
 
+#ifdef DEBUG
+	Stream &inputStream = Serial;
+#else
+    Stream &inputStream = softSerial;
+#endif
 void ProcessKobo()
 { 
-	while (softSerial.available())
+	while (inputStream.available())
 	{
-		char in = softSerial.read();
-		if (in == '$') {
-			if (Contains(koboData,"UNS"))
-			{
-				snd.PlayLKSound(GetValueFromSoundNMEA(koboData));
-			}
-			koboData = "$";
+		char in = inputStream.read();
+		if (in == '*') {
+			koboData.concat(in);
+			config.ProcessSetCommand(koboData); 
+			koboData = "";
 		} 
 		else if (in != '\n') {
 			koboData.concat(in);
 		} 
 	}
-}
-
-int GetValueFromSoundNMEA(String s)
-{
-	int i = s.indexOf(",");
-	int ii = s.indexOf("*");
-	return s.substring(i+1,ii).toInt();
 }
 
 bool Contains(String s, String search) {
@@ -282,8 +275,8 @@ void OnDblClick(int pin) {
 	return;
 #endif
 	snd.SetSound(!snd.SoundOn);
-	config.data.SoundOn = false;
-	EEPROM_writeAnything(0, config.data);
+	config.data.SoundOn = snd.SoundOn;
+	config.Save();
 }
 
 int ii = 0;
@@ -304,8 +297,8 @@ void OnClick(int pin)
 	if (!snd.SoundOn) 
 	{
 		snd.SetSound(true);
-		config.data.SoundOn =true;
-		EEPROM_writeAnything(0, config.data);
+		config.data.SoundOn = true;
+		config.Save();
 		return;
 	}
 
@@ -316,12 +309,12 @@ void OnClick(int pin)
 		snd.SoundDn2();
 	}else{
 		snd.Volume = 10;
-		snd.BaseFreq =config. data.BaseFreq;
+		snd.BaseFreq =config.data.BaseFreq;
 		snd.SoundUp2();
 	}
 
 	config.data.Volume=snd.Volume;
-	EEPROM_writeAnything(0,config.data);
+		config.Save();
 }
 
 void OnLongClick(int pin)
@@ -353,45 +346,8 @@ void VLongPress(int pin)
 #endif
 }
 
-
-
-
 #ifdef DEBUG
-void configPrint(Configuration conf)
-{
-	Serial.print("schema:");
-	Serial.println(conf.SchemaVersion);
 
-	Serial.print("mode:");
-	Serial.println(conf.VarioMode);
-
-	Serial.print("soundon:");
-	Serial.println(conf.SoundOn);
-
-	Serial.print("basefreq:");
-	Serial.println(conf.BaseFreq);
-
-	Serial.print("lowbasefreq:");
-	Serial.println(conf.LowBaseFreq);
-
-	Serial.print("LowSoundVolume:");
-	Serial.println(conf.LowSoundVolume);
-
-	Serial.print("Volume:");
-	Serial.println(conf.Volume);
-
-	Serial.print("LiftTreshold:");
-	Serial.println(conf.LiftTreshold);
-
-	Serial.print("SinkTreshold:");
-	Serial.println(conf.SinkTreshold);
-
-	Serial.print("SpeedCalibrationA:");
-	Serial.println(conf.SpeedCalibrationA);
-	Serial.print("SpeedCalibrationB:");
-	Serial.println(conf.SpeedCalibrationB);
-
-}
 //used for debuging and testing
 void OutputToSerial()
 {

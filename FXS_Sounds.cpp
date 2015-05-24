@@ -1,4 +1,6 @@
 #include "FXS_Sounds.h"
+#include "FXS_config.h"
+extern ConfigManager config;
 
 Sounds::Sounds()
 { 
@@ -54,15 +56,6 @@ void Sounds::basic(int32_t climbRate) {
 			freqShift=0;
 			cadence = period(climbRate);
 			endBeep = millis() + length(climbRate);
-
-		/*	Serial.print(climbRate/100.0);
-			Serial.print("  ");
-			Serial.print(freq);
-			Serial.print("  ");
-			Serial.print(length(climbRate));
-			Serial.print("  ");
-			Serial.print(period(climbRate));
-			Serial.println();*/
 		}
 	}
 	else
@@ -83,7 +76,7 @@ void Sounds::basic(int32_t climbRate) {
 			{
 				freqShift=freqShift+1;
 			}
-			freq= map(climbRate,0,800,BaseFreq,BaseFreq+800);
+			freq= map(climbRate,0,800,BaseFreq,BaseFreq+FREQ_RAISE);
 			toneAC(freq+freqShift,Volume, 5000,true);
 		}
 		else{
@@ -103,21 +96,21 @@ int Sounds::lowSound(int32_t climbRate) {
 
 int Sounds::period(int32_t climbRate) {
 	int minPer = 70;
-	int value =((1.3f/(climbRate+50))*40000)*DEFAULTSOUNDSPEEDFACTOR;
+	int value =((1.3f/(climbRate+50))*40000)*(config.data.RateMultiplier/100.0f);
 	if (value < minPer)
 		return minPer;
 	else
-		return value*DEFAULTSOUNDSPEEDFACTOR;
+		return value;
 }
 
 int minLength = 50;
 int Sounds::length(int32_t climbRate) {
 
-	int value =(1.5f/(climbRate+80))*30000*DEFAULTSOUNDSPEEDFACTOR; 
+	int value =(1.5f/(climbRate+80))*30000*(config.data.RateMultiplier/100.0f); 
 	if (value < minLength)
 		return minLength;
 	else
-		return value*DEFAULTSOUNDSPEEDFACTOR;
+		return value;
 }
 
 //////////////////////////////////////

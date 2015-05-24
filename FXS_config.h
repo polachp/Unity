@@ -6,8 +6,9 @@
 #include "FXS_ms4525.h"
 #include "FXS_sounds.h"
 #include "FXS_EEPROMAnything.h"
+#include <Arduino.h>
 
-#define SCHEMAVERSION 1 //this version must be changed when configuration structure changes! (causes reset of params while loading them)
+#define SCHEMAVERSION 2 //this version must be changed when configuration structure changes! (causes reset of params while loading them)
 struct Configuration
 {
 	int SchemaVersion;
@@ -19,14 +20,15 @@ struct Configuration
 	bool SoundOn;
 	int BaseFreq;
 	int LowBaseFreq;
+	int RateMultiplier;
 	int SpeedCalibrationA;
 	int SpeedCalibrationB;
+	int Sensitivity;
 };
 
 //#define VARIO
 //#define GPS
 #define AIRSPEED
-
 
 extern MS5611 baro;
 extern Sounds snd;
@@ -34,11 +36,13 @@ extern Sounds snd;
 extern MS4525  airspd;
 #endif
 
+//VARIOMODE
 const byte normal=0;
 const byte compensated=1;
+
+//SOUND VOLUME MODE 
 const byte highVolume=0;
 const byte lowVolume=0;
-
 
 class ConfigManager 
 {
@@ -47,11 +51,14 @@ public:
 	Configuration data;
 	void SetDefaults();
 	void LoadConfigToRuntime();
-	
+	void ProcessSetCommand(String cmd);
 	void SetVarioMode(byte m);
-
+	void Save();
+	void Print(Stream &icf);
 private:
-	void ReadFromMemory();
+	void Load();
+	
+	int GetValue(String s);
 };
 
 #include "HardwareSerial.h"

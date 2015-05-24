@@ -16,13 +16,14 @@ class FXS_CompensatedVario
   
     float rawTotalEnergy ;
     float abs_deltaCompensatedClimbRate ;
-    float smoothingDteMin;
+   
     float expoSmoothDte_auto ;
     float rawCompensation ;
     float totalEnergyLowPass ;
     float totalEnergyHighPass ;
     
   public:
+	float smoothingDteMin;
     bool compensatedClimbRateAvailable ;
     int32_t compensatedClimbRate ; 
     FXS_CompensatedVario();

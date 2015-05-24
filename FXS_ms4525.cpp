@@ -12,6 +12,7 @@ extern void delay(unsigned long ms) ;
 MS4525::MS4525(uint8_t addr)
 { // constructor
 	_addr = addr;
+	setCalibration(100,0);
 }
 
 // **************** Setup the 4525DO sensor *********************

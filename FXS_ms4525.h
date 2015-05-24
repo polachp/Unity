@@ -34,10 +34,10 @@ class MS4525 {
     void setup();
 	void setCalibration(int a,int b);
     void readSensor();
-
-  private:
 	float calib_A;
 	float calib_B;
+  private:
+	
     KalmanFilter   kalmanAirspeedSM;
     void SendCommand(byte command);
     uint8_t _addr;
