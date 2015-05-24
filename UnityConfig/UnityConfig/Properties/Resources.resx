@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="logo_small" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\logo-small.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PROPERTY_AirspeedCompensationAParam_Description" xml:space="preserve">
+    <value>Basic linear compensation is implemented by y =A*x+B equation. This value is A coefficient.</value>
+  </data>
+  <data name="PROPERTY_AirspeedCompensationAParam_Title" xml:space="preserve">
+    <value>Param A</value>
+  </data>
+  <data name="PROPERTY_AirspeedCompensationAParam_ValidationMessage" xml:space="preserve">
+    <value />
+  </data>
+  <data name="PROPERTY_AirspeedCompensationBParam_Description" xml:space="preserve">
+    <value>Basic linear compensation is implemented by y =A*x+B equation. This value is B coefficient.</value>
+  </data>
+  <data name="PROPERTY_AirspeedCompensationBParam_Title" xml:space="preserve">
+    <value>Param B</value>
+  </data>
+  <data name="PROPERTY_AirspeedCompensationBParam_ValidationMessage" xml:space="preserve">
+    <value />
+  </data>
+  <data name="PROPERTY_BaseFrequency_Description" xml:space="preserve">
+    <value>Base sound frequency - higher values means higher pitch. The oscilation frequency value for highest volume is around 2800.</value>
+  </data>
+  <data name="PROPERTY_BaseFrequency_Title" xml:space="preserve">
+    <value>Base Frequency</value>
+  </data>
+  <data name="PROPERTY_BaseFrequency_ValidationMessage" xml:space="preserve">
+    <value />
+  </data>
+  <data name="PROPERTY_BeepRateMultiplier_Description" xml:space="preserve">
+    <value>Vario beep speed. For slower sound use lower values. For quick beeps use higher values.</value>
+  </data>
+  <data name="PROPERTY_BeepRateMultiplier_Title" xml:space="preserve">
+    <value>Beep Rate Multiplier</value>
+  </data>
+  <data name="PROPERTY_BeepRateMultiplier_ValidationMessage" xml:space="preserve">
+    <value />
+  </data>
+  <data name="PROPERTY_LiftTreshold_Description" xml:space="preserve">
+    <value>Vario sound treshold for lift signalisation.</value>
+  </data>
+  <data name="PROPERTY_LiftTreshold_Title" xml:space="preserve">
+    <value>Lift Threshold</value>
+  </data>
+  <data name="PROPERTY_LiftTreshold_ValidationMessage" xml:space="preserve">
+    <value />
+  </data>
+  <data name="PROPERTY_LowSoundBaseFrequency_Description" xml:space="preserve">
+    <value>Low volume mode sound frequency - higher values means higher pitch.</value>
+  </data>
+  <data name="PROPERTY_LowSoundBaseFrequency_Title" xml:space="preserve">
+    <value>Base Frequency</value>
+  </data>
+  <data name="PROPERTY_LowSoundBaseFrequency_ValidationMessage" xml:space="preserve">
+    <value />
+  </data>
+  <data name="PROPERTY_LowSoundVolume_Description" xml:space="preserve">
+    <value>Vario sound level in low volume mode.</value>
+  </data>
+  <data name="PROPERTY_LowSoundVolume_Title" xml:space="preserve">
+    <value>Volume</value>
+  </data>
+  <data name="PROPERTY_LowSoundVolume_ValidationMessage" xml:space="preserve">
+    <value />
+  </data>
+  <data name="PROPERTY_Sensitivity_Description" xml:space="preserve">
+    <value>Vario sensitivity. Higher value means higher sensitivity. You can tune this so the vario reactions suits you the best.</value>
+  </data>
+  <data name="PROPERTY_Sensitivity_Title" xml:space="preserve">
+    <value>Sensitivity</value>
+  </data>
+  <data name="PROPERTY_Sensitivity__ValidationMessage" xml:space="preserve">
+    <value />
+  </data>
+  <data name="PROPERTY_SinkTreshold_Description" xml:space="preserve">
+    <value>Vario sound treshold for sink signalisation</value>
+  </data>
+  <data name="PROPERTY_SinkTreshold_Title" xml:space="preserve">
+    <value>Sink Threshold</value>
+  </data>
+  <data name="PROPERTY_SinkTreshold_ValidationMessage" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Generate_ScriptGenerated" xml:space="preserve">
+    <value>\r\n\r\nScript was generated and copied to clipboard.</value>
+  </data>
+  <data name="Import_Error" xml:space="preserve">
+    <value>Some error with parsing file. Check logs.</value>
+  </data>
+  <data name="Menu_File_Export_Title" xml:space="preserve">
+    <value>&amp;Export script</value>
+  </data>
+  <data name="Menu_File_Generate_Title" xml:space="preserve">
+    <value>&amp;Generate script</value>
+  </data>
+  <data name="Menu_File_Import_Title" xml:space="preserve">
+    <value>&amp;Import script</value>
+  </data>
+  <data name="Menu_File_Quit_Title" xml:space="preserve">
+    <value>&amp;Quit</value>
+  </data>
+  <data name="Menu_File_Title" xml:space="preserve">
+    <value>&amp;File</value>
+  </data>
+  <data name="Menu_Help_About_Title" xml:space="preserve">
+    <value>&amp;About</value>
+  </data>
+  <data name="Menu_Help_Title" xml:space="preserve">
+    <value>&amp;Help</value>
+  </data>
+  <data name="Menu_Languages_Czech_Title" xml:space="preserve">
+    <value>&amp;Czech</value>
+  </data>
+  <data name="Menu_Languages_English_Title" xml:space="preserve">
+    <value>&amp;English</value>
+  </data>
+  <data name="Menu_Languages_Title" xml:space="preserve">
+    <value>&amp;Languages</value>
+  </data>
+  <data name="PROPERTY_GROUP_AirspeedCompensation" xml:space="preserve">
+    <value>Airspeed Compensation</value>
+  </data>
+  <data name="PROPERTY_GROUP_Sounds" xml:space="preserve">
+    <value>Sounds</value>
+  </data>
+  <data name="PROPERTY_GROUP_Sounds_Basic" xml:space="preserve">
+    <value>Basic</value>
+  </data>
+  <data name="PROPERTY_GROUP_Sounds_LowSound" xml:space="preserve">
+    <value>Low Sound</value>
+  </data>
+  <data name="PROPERTY_GROUP_Vario" xml:space="preserve">
+    <value>Vario</value>
+  </data>
+  <data name="Setting_Property_Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Button_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Button_OK" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="Menu_Tool_Setting_Title" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Menu_Tool_Title" xml:space="preserve">
+    <value>Tools</value>
+  </data>
+  <data name="MessageBox_PleaseRestartApplication" xml:space="preserve">
+    <value>Please restart application to apply settings.</value>
+  </data>
+  <data name="Control_High" xml:space="preserve">
+    <value>High</value>
+  </data>
+  <data name="Control_Low" xml:space="preserve">
+    <value>Low</value>
+  </data>
+</root>
