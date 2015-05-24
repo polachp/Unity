@@ -45,7 +45,6 @@ namespace UnityConfig
         private void MainForm_Load(object sender, EventArgs e)
         {
             SetLanguage();
-
             var setting = UnityConfiguration.UnitySetting.CreateDefault();
             this.configurationControl.Setting = setting;
 

@@ -111,7 +111,7 @@
             // settingToolStripMenuItem
             // 
             this.settingToolStripMenuItem.Name = "settingToolStripMenuItem";
-            this.settingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.settingToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
             this.settingToolStripMenuItem.Text = "Setting";
             this.settingToolStripMenuItem.Click += new System.EventHandler(this.settingToolStripMenuItem_Click);
             // 
@@ -128,14 +128,14 @@
             // englishToolStripMenuItem
             // 
             this.englishToolStripMenuItem.Name = "englishToolStripMenuItem";
-            this.englishToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.englishToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.englishToolStripMenuItem.Text = "English";
             this.englishToolStripMenuItem.Click += new System.EventHandler(this.englishToolStripMenuItem_Click);
             // 
             // czechToolStripMenuItem
             // 
             this.czechToolStripMenuItem.Name = "czechToolStripMenuItem";
-            this.czechToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.czechToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.czechToolStripMenuItem.Text = "Czech";
             this.czechToolStripMenuItem.Click += new System.EventHandler(this.czechToolStripMenuItem_Click);
             // 
@@ -157,13 +157,14 @@
             // saveScriptFileDialog
             // 
             this.saveScriptFileDialog.DefaultExt = "unityconfig";
-            this.saveScriptFileDialog.Filter = "Unity Config Files|*.unityconfig";
+            this.saveScriptFileDialog.FileName = "unityConfig";
+            this.saveScriptFileDialog.Filter = "Unity Config Files|*.sh";
             this.saveScriptFileDialog.RestoreDirectory = true;
             // 
             // openScriptFileDialog
             // 
             this.openScriptFileDialog.DefaultExt = "unityconfig";
-            this.openScriptFileDialog.Filter = "Unity Config Files|*.unityconfig";
+            this.openScriptFileDialog.Filter = "Unity Config Files|*.sh";
             // 
             // configurationControl
             // 

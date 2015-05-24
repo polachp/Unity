@@ -43,10 +43,8 @@ int vario = 0 ;
 //loop timers
 unsigned long nextVarioDataUpdateMillis = 5000;
 unsigned long nextGpsOutputTimeMillis = 5000;
-
 void setup()
 {
-
 	button.Configure(BUTTONPIN);
 	button.OnClick = OnClick;
 	button.OnLongPress= OnLongClick;
@@ -72,6 +70,7 @@ void setup()
 			break;
 		}
 	}
+
 	actualPressure = 101325;
 	baro.setup();
 #ifdef AIRSPEED
@@ -79,17 +78,23 @@ void setup()
 #endif
 	config.LoadConfigToRuntime();
 	softSerial.begin(SERIAL_SPEED);
-	SetupGps();
-	Serial.begin(SERIAL_SPEED);
-	config.Print(Serial);
+	
+	
 }
 
+bool initialized = false;
 void loop() {
+	if (!initialized && millis()/1000 > 10)
+	{
+		SetupGps();
+		Serial.begin(SERIAL_SPEED);
+		initialized = true;
+		config.Print(Serial);
+	}
 	readSensors(); //Executive part that reads all sensor values and process them  
 
 #ifdef VARIO_SOUND_TEST
 	snd.VarioSound(vario);
-	//OutputToSerial();
 #else
 #ifdef AIRSPEED
 	if (baro.varioData.climbRateAvailable && dteVario.compensatedClimbRateAvailable && config.data.VarioMode == 1)
@@ -100,19 +105,18 @@ void loop() {
 	snd.VarioSound(baro.varioData.climbRate);
 #endif
 #endif
-
 	ProcessKobo();
-#ifndef DEBUG
-	ProcessGPS();
-	
-	if ((millis() - nextVarioDataUpdateMillis) > VARIODATASENDINTERVAL)
+	if (initialized)
 	{
-		SendVarioData();
-		nextVarioDataUpdateMillis = millis();
+		ProcessGPS();
+		if ((millis() - nextVarioDataUpdateMillis) > VARIODATASENDINTERVAL)
+		{
+			SendVarioData();
+			nextVarioDataUpdateMillis = millis();
+		}
+
+		button.CheckBP();
 	}
-#endif
-	button.CheckBP();
-	
 }// LOOP
 
 // $LXWP0,logger_stored, airspeed, airaltitude,
@@ -174,6 +178,7 @@ void send_cmd(Stream &icf, String &cmd) {
 }
 
 void SetupGps(){
+
 	String cmd = "";
 
 	//cmd = "PMTK869,1,1"; 
@@ -201,6 +206,10 @@ void SetupGps(){
 
 	cmd = "PMTK313,1"; //waas
 	send_cmd(softSerial, cmd);
+
+	//cmd = "PMTK251,19200";
+	//send_cmd(softSerial, cmd);
+
 	//Serial.begin(GPS_SERIAL_SPEED);
 }
 
@@ -220,9 +229,9 @@ void ProcessGPS()
 }
 
 #ifdef DEBUG
-	Stream &inputStream = Serial;
+Stream &inputStream = Serial;
 #else
-    Stream &inputStream = softSerial;
+Stream &inputStream = softSerial;
 #endif
 void ProcessKobo()
 { 
@@ -314,7 +323,7 @@ void OnClick(int pin)
 	}
 
 	config.data.Volume=snd.Volume;
-		config.Save();
+	config.Save();
 }
 
 void OnLongClick(int pin)

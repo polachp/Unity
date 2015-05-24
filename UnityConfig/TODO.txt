@@ -1,0 +1,10 @@
+Todo:
+1/ V unixu  musí být konec řádky jen LF, ne CRLF. Ale jak to generovat v c# jsem nenašel.
+2/ Sleep nastavit na 0.1
+3/ Kobo se pripoji jako disk s volume label KOBOereader, z hlediska jednoduchosti bych chtěl v menu volby:
+Upload do Unity, Uložit, Načíst. Upload unity by rovnou hodilo skript na diskkobo/LK8000/kobo případne diskkobo/XCsoar/kobo
+Co si o tom myslíš? Chtěl bych aby uživatel nepřišel se skriptem do kontaktu, prostě by jen připojil kobo, nastavil a klikl upload. Hotovo. Stejně tak by možná program mohl umět detekovat
+připojené kobo a nabídnout načtení konfigurace. Jsou to detaily ale uživatelsky příjemný. Ještě musím zjistit jak se hlásí jako disk to Kobo GLO. Aby tenhle mechanismus chodil s oběma.
+
+
+

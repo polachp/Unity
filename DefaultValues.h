@@ -2,7 +2,6 @@
 #define DEFAULTVALUES_h
 //Hardcoded defaults
 #define SENSITIVITY_MIN 90
-#define SENSITIVITY_MAX 150
 #define SMOOTHING_DTE_MIN 90
 #define SMOOTHING_DTE_MAX 1000
 #define SMOOTHING_DTE_MIN_AT 100
