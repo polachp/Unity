@@ -60,6 +60,7 @@ void ConfigManager::SetDefaults()
 	data.BaseFreq = DEFAULTSOUNDBASEFREQ;
 	data.LowBaseFreq = DEFAULTLOWSOUNDBASEFREQ;
 	data.LowSoundVolume = LOWSOUNDVOLUME;
+	data.AlarmsVolume= ALARMS_VOLUME;
 	data.LiftTreshold = DEFAULT_LIFT_TRESHOLD;
 	data.SinkTreshold = DEFAULT_SINK_TRESHOLD;
 	data.Volume = LOWSOUNDVOLUME;
@@ -134,6 +135,14 @@ void ConfigManager::ProcessSetCommand(String sentence)
 		return;
 	}
 
+	if (Contains(sentence,"UNAV"))
+	{
+		value = GetValue(sentence);
+		value = constrain(value,9,10);
+		data.AlarmsVolume =value;
+		return;
+	}
+
 	if (Contains(sentence,"UNBR"))
 	{
 		value = GetValue(sentence);
@@ -174,7 +183,7 @@ void ConfigManager::ProcessSetCommand(String sentence)
 	if (Contains(sentence,"UNS"))
 	{
 		byte lastVolume= snd.Volume;
-		snd.Volume = 10;
+		snd.Volume = data.AlarmsVolume;
 		snd.PlayLKSound(GetValue(sentence));
 		snd.Volume = lastVolume;
 	}

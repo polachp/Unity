@@ -2,7 +2,7 @@
 //Fly X Sense project
 //=====================================================================================================
 
-//#define DEBUG
+#define DEBUG
 //#define VARIO_SOUND_TEST
 //#define DEBUGCOMPENSATEDCLIMBRATE
 //#define DEBUGOUTDATATOSERIAL
@@ -30,6 +30,7 @@ String koboData="";
 Sounds snd;
 ConfigManager config;
 MS5611 baro(I2C_MS5611_Add);
+bool initialized = false; //delayed initialization of GSPS com port to let the softserial time to load configuration after device start
 
 #ifdef AIRSPEED // differential pressure
 #define ALLOWMODESWITCH
@@ -78,13 +79,11 @@ void setup()
 #endif
 	config.LoadConfigToRuntime();
 	softSerial.begin(SERIAL_SPEED);
-	
-	
 }
 
-bool initialized = false;
+
 void loop() {
-	if (!initialized && millis()/1000 > 10)
+	if (!initialized && millis() > SERIAL_COMM_DELAY)
 	{
 		SetupGps();
 		Serial.begin(SERIAL_SPEED);
@@ -114,9 +113,8 @@ void loop() {
 			SendVarioData();
 			nextVarioDataUpdateMillis = millis();
 		}
-
-		button.CheckBP();
 	}
+	button.CheckBP();
 }// LOOP
 
 // $LXWP0,logger_stored, airspeed, airaltitude,
@@ -218,7 +216,7 @@ void ProcessGPS()
 	while (Serial.available())
 	{
 		char in = Serial.read();
-		if (in == '$') {
+	    if (in == '$') {
 			Serial.println(gpsData);
 			gpsData = "$";
 		} 
@@ -266,7 +264,6 @@ void readSensors() {
 
 #ifdef AIRSPEED
 	airspd.readSensor(); //reread senson to provide more data
-
 	if ( baro.varioData.altitudeAt20MsecAvailable == true )
 	{
 		dteVario.CalculateDte();

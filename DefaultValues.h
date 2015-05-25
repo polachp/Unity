@@ -13,9 +13,10 @@
 #define SPEEDCALIBRATION_A 95
 #define SPEEDCALIBRATION_B 0
 
+#define ALARMS_VOLUME 10
 #define LOWSOUNDVOLUME 9 // low sound volume. High sound volume uses 10 by default
 #define DEFAULTSOUNDBASEFREQ 2750 // base sound frequency
-#define DEFAULTLOWSOUNDBASEFREQ 600 // base sound frequency for low sound mode
+#define DEFAULTLOWSOUNDBASEFREQ 1000 // base sound frequency for low sound mode
 #define DEFAULT_SOUND_RATE_MULTIPLIER 100 // sound beep speed coeff (use 0.5-1.5)
 #define FREQ_RAISE 800 //frequency raises from basefreq up to basefreq + FREQ_RAISE on vario value 0-8
 
@@ -31,6 +32,6 @@
 #define I2C_MS5611_Add 0x77
 #define I2C_4525_Add   0x28
 #define PIN_LED        13 
-
+#define SERIAL_COMM_DELAY 10000
 
 #endif

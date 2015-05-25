@@ -125,13 +125,13 @@ void Sounds::SlideSound(int start,int high,int raiseStep,int delayTime){
 	{
 		for (int aa = start; aa <= high ; aa = aa + raiseStep)
 		{
-			toneAC( aa, 5000);      
+			toneAC( aa,Volume , 5000,true);      
 			delay(delayTime);
 		}
 	}else{
 		for (int aa = high; aa >= start ; aa = aa - raiseStep)
 		{
-			toneAC( aa, 5000);      
+			toneAC( aa,Volume , 5000,true);         
 			delay(delayTime);
 		}
 	}
@@ -140,17 +140,17 @@ void Sounds::SlideSound(int start,int high,int raiseStep,int delayTime){
 
 void Sounds::SoundUp()                 //play only once welcome beep after turning on arduino vario
 {
-	for (int aa = 1000; aa <= 2600; aa = aa + 25)
+	for (int aa = 1000; aa <= 3000; aa = aa + 25)
 	{
-		toneAC( aa, 60);         // play beep on pin 9 (note,duration), it is louder if we move aplitude phase
+		toneAC( aa,Volume, 60,true);         // play beep on pin 9 (note,duration), it is louder if we move aplitude phase
 		delay(4);
 	}
 	noToneAC();
 }
 
 void Sounds::SoundDn() {
-	for (int freq = 2600; freq >= 1000; freq =freq - 25) {  
-		toneAC(freq,60); 
+	for (int freq = 3000; freq >= 1000; freq =freq - 25) {  
+		toneAC(freq,Volume,60,true); 
 		delay(4);    
 	}
 	noToneAC();
@@ -158,24 +158,24 @@ void Sounds::SoundDn() {
 
 void Sounds::Click(int tone)                 //play only once welcome beep after turning on arduino vario
 {
-	Play(tone,25);
+	toneAC(tone,Volume,25,true);
 	delay(25);
 	noToneAC();
 }
 
 void Sounds:: SoundUp2()                 //play only once welcome beep after turning on arduino vario
 {
-	for (int aa = 500; aa <= 2600; aa = aa + 80)
+	for (int aa = 1000; aa <= 3100; aa = aa + 80)
 	{
-		toneAC( aa, 60);         // play beep on pin 9 (note,duration), it is louder if we move aplitude phase
+		toneAC( aa,Volume,60,true);         // play beep on pin 9 (note,duration), it is louder if we move aplitude phase
 		delay(4);
 	}
 	noToneAC();
 }
 
 void Sounds::SoundDn2() {
-	for (int freq = 2600; freq >= 500; freq =freq - 80) {  
-		toneAC(freq,60); 
+	for (int freq = 3100; freq >= 1000; freq =freq - 80) {  
+		toneAC(freq,Volume,60,true); 
 		delay(4);    
 	}
 	noToneAC();
@@ -185,9 +185,9 @@ void Sounds::Alarm(byte rings) {
 
 	for (int i = 0; i < rings; i++)
 	{
-		for (int aa = 300; aa <= 1000; aa = aa + 100)
+		for (int aa = 2000; aa <= 2700; aa = aa + 100)
 		{
-			toneAC( aa, 60);     
+			toneAC(aa,Volume,60,true);     
 			delay(15);
 		}
 	}
@@ -196,9 +196,9 @@ void Sounds::Alarm(byte rings) {
 
 void Sounds::Sonar(int level) 
 {  
-	int freq = 3900+(level*80);
-	toneAC( freq,100);delay(80+(level*15));
-	SlideSound( freq, 6000, 60, 1);
+	int freq = 2400+(level*80);
+	toneAC( freq,Volume,100,true);delay(80+(level*15));
+	SlideSound( freq, 4000, 15, 1);
 }
 
 
