@@ -17,6 +17,7 @@ struct Configuration
 	int SinkTreshold;
 	int Volume;
 	int LowSoundVolume;
+	int AlarmsVolume;
 	bool SoundOn;
 	int BaseFreq;
 	int LowBaseFreq;
