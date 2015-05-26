@@ -156,7 +156,7 @@ namespace UnityConfig.UnityConfiguration
 //printf '$UNLT,5*' > $TTY_DEV
 //sleep 1
 
-            return string.Format("printf '${0},{1}*' > $TTY_DEV\r\nsleep 1", this.PacketCode, this.AsPacketValueFunc(this.Value));
+            return string.Format("printf '${0},{1}*' > $TTY_DEV\nsleep 0.1\n", this.PacketCode, this.AsPacketValueFunc(this.Value));
         }
 
         public string Description { get; set; }

@@ -159,7 +159,7 @@
             // 
             // valSinkTreshold
             // 
-            this.valSinkTreshold.DecimalPlaces = 1;
+            this.valSinkTreshold.DecimalPlaces = 2;
             this.valSinkTreshold.Increment = new decimal(new int[] {
             1,
             0,
@@ -190,7 +190,7 @@
             // 
             // valLiftTreshold
             // 
-            this.valLiftTreshold.DecimalPlaces = 1;
+            this.valLiftTreshold.DecimalPlaces = 2;
             this.valLiftTreshold.Increment = new decimal(new int[] {
             1,
             0,

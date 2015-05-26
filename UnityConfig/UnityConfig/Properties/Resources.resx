@@ -277,4 +277,58 @@
   <data name="Control_Low" xml:space="preserve">
     <value>Low</value>
   </data>
+  <data name="DeviceInfoForm_ConnectionStatus_Connected" xml:space="preserve">
+    <value>Connected</value>
+  </data>
+  <data name="DeviceInfoForm_ConnectionStatus_Disconnected" xml:space="preserve">
+    <value>Disconnected</value>
+  </data>
+  <data name="DeviceInfoForm_Group_Connected" xml:space="preserve">
+    <value>Connection</value>
+  </data>
+  <data name="DeviceInfoForm_Group_DiskInformation" xml:space="preserve">
+    <value>Disk information</value>
+  </data>
+  <data name="DeviceInfoForm_Group_Other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="DeviceInfoForm_Label_Directory_Kobo" xml:space="preserve">
+    <value>Kobo</value>
+  </data>
+  <data name="DeviceInfoForm_Label_Directory_NavigationSW" xml:space="preserve">
+    <value>Navigation SW</value>
+  </data>
+  <data name="DeviceInfoForm_Label_IsConnected" xml:space="preserve">
+    <value>Connection status</value>
+  </data>
+  <data name="DeviceInfoForm_Label_NavigationSW" xml:space="preserve">
+    <value>Navigation SW</value>
+  </data>
+  <data name="DeviceInfoForm_NoDeviceInfo" xml:space="preserve">
+    <value>No device info.</value>
+  </data>
+  <data name="DeviceInfoForm_NoError" xml:space="preserve">
+    <value>No error.</value>
+  </data>
+  <data name="Menu_Tool_RefreshDevice_Title" xml:space="preserve">
+    <value>Refresh device</value>
+  </data>
+  <data name="Menu_Unity_Title" xml:space="preserve">
+    <value>Unity</value>
+  </data>
+  <data name="Menu_Unity_ReadConfig_Title" xml:space="preserve">
+    <value>Read config</value>
+  </data>
+  <data name="Menu_Unity_WriteConfig_Title" xml:space="preserve">
+    <value>Write config</value>
+  </data>
+  <data name="Menu_Unity_Device_Title" xml:space="preserve">
+    <value>Device</value>
+  </data>
+  <data name="DeviceInfoForm_ConfigFileDoesntExist" xml:space="preserve">
+    <value>Config file doesn't exist.</value>
+  </data>
+  <data name="DeviceInfoForm_Label_ScriptPath" xml:space="preserve">
+    <value>Script path</value>
+  </data>
 </root>

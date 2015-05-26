@@ -129,6 +129,45 @@
   <data name="Control_Low" xml:space="preserve">
     <value>Nízká</value>
   </data>
+  <data name="DeviceInfoForm_ConfigFileDoesntExist" xml:space="preserve">
+    <value>Konfigurační soubor neexistuje.</value>
+  </data>
+  <data name="DeviceInfoForm_ConnectionStatus_Connected" xml:space="preserve">
+    <value>Připojeno</value>
+  </data>
+  <data name="DeviceInfoForm_ConnectionStatus_Disconnected" xml:space="preserve">
+    <value>Odpojeno</value>
+  </data>
+  <data name="DeviceInfoForm_Group_Connected" xml:space="preserve">
+    <value>Připojení</value>
+  </data>
+  <data name="DeviceInfoForm_Group_DiskInformation" xml:space="preserve">
+    <value>Informace o disku</value>
+  </data>
+  <data name="DeviceInfoForm_Group_Other" xml:space="preserve">
+    <value>Jiné</value>
+  </data>
+  <data name="DeviceInfoForm_Label_Directory_Kobo" xml:space="preserve">
+    <value>Kobo</value>
+  </data>
+  <data name="DeviceInfoForm_Label_Directory_NavigationSW" xml:space="preserve">
+    <value>Navigační SW</value>
+  </data>
+  <data name="DeviceInfoForm_Label_IsConnected" xml:space="preserve">
+    <value>Stav připojení</value>
+  </data>
+  <data name="DeviceInfoForm_Label_NavigationSW" xml:space="preserve">
+    <value>Navigační SW</value>
+  </data>
+  <data name="DeviceInfoForm_Label_ScriptPath" xml:space="preserve">
+    <value>Skript</value>
+  </data>
+  <data name="DeviceInfoForm_NoDeviceInfo" xml:space="preserve">
+    <value>Žádné informace o přistroji.</value>
+  </data>
+  <data name="DeviceInfoForm_NoError" xml:space="preserve">
+    <value>Vše OK.</value>
+  </data>
   <data name="Generate_ScriptGenerated" xml:space="preserve">
     <value>\r\n\r\nSkript byl vygenerovaný a zkopírován do schránky.</value>
   </data>
@@ -165,11 +204,26 @@
   <data name="Menu_Languages_Title" xml:space="preserve">
     <value>&amp;Jazyky</value>
   </data>
+  <data name="Menu_Tool_RefreshDevice_Title" xml:space="preserve">
+    <value>Obnovit informace o zařízení</value>
+  </data>
   <data name="Menu_Tool_Setting_Title" xml:space="preserve">
     <value>Nastavení</value>
   </data>
   <data name="Menu_Tool_Title" xml:space="preserve">
     <value>Nástroje</value>
+  </data>
+  <data name="Menu_Unity_Device_Title" xml:space="preserve">
+    <value>Zařízení</value>
+  </data>
+  <data name="Menu_Unity_ReadConfig_Title" xml:space="preserve">
+    <value>Read config</value>
+  </data>
+  <data name="Menu_Unity_Title" xml:space="preserve">
+    <value>Unity</value>
+  </data>
+  <data name="Menu_Unity_WriteConfig_Title" xml:space="preserve">
+    <value>Write config</value>
   </data>
   <data name="MessageBox_PleaseRestartApplication" xml:space="preserve">
     <value>Pro uplatnění nastavení restartujte aplikaci.</value>

@@ -20,10 +20,19 @@ namespace UnityConfig
             InitializeComponent();
         }
 
+        private UnityDevice Device;
+
+        private void RefreshDeviceInformation()
+        {
+             this.Device = UnityDeviceManager.TryGetDeviceInformation();
+             unityToolStripMenuItem.Visible = this.Device.IsConnected;
+
+             readConfigToolStripMenuItem.Enabled = this.Device.IsReady && this.Device.ConfigFileExists;
+             writeConfigToolStripMenuItem.Enabled = this.Device.IsReady;             
+        }
+
         private void SetLanguage()
         {
-            
-
             //Menus
             fileToolStripMenuItem.Text = Resources.Menu_File_Title;
             importScriptToolStripMenuItem.Text = Resources.Menu_File_Import_Title;
@@ -40,26 +49,30 @@ namespace UnityConfig
 
             toolsToolStripMenuItem.Text = Resources.Menu_Tool_Title;
             settingToolStripMenuItem.Text = Resources.Menu_Tool_Setting_Title;
+
+            unityToolStripMenuItem.Text = Resources.Menu_Unity_Title;
+            readConfigToolStripMenuItem.Text= Resources.Menu_Unity_ReadConfig_Title;
+            writeConfigToolStripMenuItem.Text = Resources.Menu_Unity_WriteConfig_Title;
+            deviceToolStripMenuItem.Text = Resources.Menu_Unity_Device_Title;
+
+            refreshDeviceToolStripMenuItem.Text = Resources.Menu_Tool_RefreshDevice_Title;            
         }
 
         private void MainForm_Load(object sender, EventArgs e)
-        {
+        {            
             SetLanguage();
+            this.RefreshDeviceInformation();
+
             var setting = UnityConfiguration.UnitySetting.CreateDefault();
             this.configurationControl.Setting = setting;
-
-            //using (var form = new AboutForm())
-            //{
-            //    form.ShowDialog();
-            //}
         }
 
         private string GenerateScript(UnitySetting setting)
         {
             var z = setting.AllProperties;
             StringBuilder sb = new StringBuilder();
-            z.ForEach(p => sb.AppendLine(p.GetPacket()));
-            sb.AppendLine("printf '$UNSAVE*' > $TTY_DEV");
+            z.ForEach(p => sb.Append(p.GetPacket()));
+            sb.Append("printf '$UNSAVE*' > $TTY_DEV\n");
 
             return sb.ToString();
         }
@@ -146,6 +159,47 @@ namespace UnityConfig
         private void settingToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (var form = new SettingForm())
+            {
+                form.ShowDialog();
+            }
+        }
+
+        private void refreshDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.RefreshDeviceInformation();
+        }
+
+        private void readConfigToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(MessageBox.Show("Do you really want read setting from Unity?", "Reading setting from Unity...", MessageBoxButtons.OKCancel) == System.Windows.Forms.DialogResult.OK)
+            {
+                var fileName = this.Device.ConfigSkriptFilePath;
+                var error = false;
+                var setting = UnityScriptParser.ParseScriptFromFile(fileName, out error);
+                if (error)
+                {
+                    MessageBox.Show(Resources.Import_Error);
+                }
+                else
+                {
+                    configurationControl.Setting = setting;
+                }
+            }
+        }
+
+        private void writeConfigToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Do you really want write setting into Unity?", "Writing setting into Unity...", MessageBoxButtons.OKCancel) == System.Windows.Forms.DialogResult.OK)
+            {
+                var fileName = this.Device.ConfigSkriptFilePath;
+                var script = this.GenerateScript(configurationControl.Setting);
+                File.WriteAllText(fileName, script);
+            }
+        }
+
+        private void deviceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var form = new DeviceInfoForm(this.Device))
             {
                 form.ShowDialog();
             }

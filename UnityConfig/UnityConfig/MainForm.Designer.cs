@@ -37,11 +37,16 @@
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.refreshDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.languagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.englishToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.czechToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.unityToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.readConfigToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.writeConfigToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveScriptFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openScriptFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.configurationControl = new UnityConfig.ConfigurationControl();
@@ -54,7 +59,8 @@
             this.fileToolStripMenuItem,
             this.toolsToolStripMenuItem,
             this.languagesToolStripMenuItem,
-            this.helpToolStripMenuItem});
+            this.helpToolStripMenuItem,
+            this.unityToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(453, 24);
@@ -103,7 +109,8 @@
             // toolsToolStripMenuItem
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.settingToolStripMenuItem});
+            this.settingToolStripMenuItem,
+            this.refreshDeviceToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
@@ -111,9 +118,16 @@
             // settingToolStripMenuItem
             // 
             this.settingToolStripMenuItem.Name = "settingToolStripMenuItem";
-            this.settingToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
+            this.settingToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.settingToolStripMenuItem.Text = "Setting";
             this.settingToolStripMenuItem.Click += new System.EventHandler(this.settingToolStripMenuItem_Click);
+            // 
+            // refreshDeviceToolStripMenuItem
+            // 
+            this.refreshDeviceToolStripMenuItem.Name = "refreshDeviceToolStripMenuItem";
+            this.refreshDeviceToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.refreshDeviceToolStripMenuItem.Text = "Refresh device";
+            this.refreshDeviceToolStripMenuItem.Click += new System.EventHandler(this.refreshDeviceToolStripMenuItem_Click);
             // 
             // languagesToolStripMenuItem
             // 
@@ -154,16 +168,47 @@
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
+            // unityToolStripMenuItem
+            // 
+            this.unityToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.deviceToolStripMenuItem,
+            this.readConfigToolStripMenuItem,
+            this.writeConfigToolStripMenuItem});
+            this.unityToolStripMenuItem.Name = "unityToolStripMenuItem";
+            this.unityToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
+            this.unityToolStripMenuItem.Text = "Unity";
+            // 
+            // deviceToolStripMenuItem
+            // 
+            this.deviceToolStripMenuItem.Name = "deviceToolStripMenuItem";
+            this.deviceToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.deviceToolStripMenuItem.Text = "Device";
+            this.deviceToolStripMenuItem.Click += new System.EventHandler(this.deviceToolStripMenuItem_Click);
+            // 
+            // readConfigToolStripMenuItem
+            // 
+            this.readConfigToolStripMenuItem.Name = "readConfigToolStripMenuItem";
+            this.readConfigToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.readConfigToolStripMenuItem.Text = "Read Config";
+            this.readConfigToolStripMenuItem.Click += new System.EventHandler(this.readConfigToolStripMenuItem_Click);
+            // 
+            // writeConfigToolStripMenuItem
+            // 
+            this.writeConfigToolStripMenuItem.Name = "writeConfigToolStripMenuItem";
+            this.writeConfigToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.writeConfigToolStripMenuItem.Text = "Write Config";
+            this.writeConfigToolStripMenuItem.Click += new System.EventHandler(this.writeConfigToolStripMenuItem_Click);
+            // 
             // saveScriptFileDialog
             // 
-            this.saveScriptFileDialog.DefaultExt = "unityconfig";
+            this.saveScriptFileDialog.DefaultExt = "sh";
             this.saveScriptFileDialog.FileName = "unityConfig";
             this.saveScriptFileDialog.Filter = "Unity Config Files|*.sh";
             this.saveScriptFileDialog.RestoreDirectory = true;
             // 
             // openScriptFileDialog
             // 
-            this.openScriptFileDialog.DefaultExt = "unityconfig";
+            this.openScriptFileDialog.DefaultExt = "sh";
             this.openScriptFileDialog.Filter = "Unity Config Files|*.sh";
             // 
             // configurationControl
@@ -213,6 +258,11 @@
         private System.Windows.Forms.ToolStripMenuItem czechToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem unityToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem refreshDeviceToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem readConfigToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem writeConfigToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deviceToolStripMenuItem;
     }
 }
 

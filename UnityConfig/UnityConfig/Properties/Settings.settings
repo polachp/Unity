@@ -8,5 +8,14 @@
     <Setting Name="SettingInitialized" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="Unity_Device_Default_ConfigFileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">unityConfig.sh</Value>
+    </Setting>
+    <Setting Name="Unity_Device_Default_VolumeLabel" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">KOBOereader</Value>
+    </Setting>
+    <Setting Name="Unity_Device_Default_KoboDirectory" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">kobo</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
