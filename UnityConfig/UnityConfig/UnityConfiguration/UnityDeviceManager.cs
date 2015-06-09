@@ -5,16 +5,52 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityConfig.Properties;
+using NLog;
+using NLog.Fluent;
 
 namespace UnityConfig.UnityConfiguration
 {
     public static class UnityDeviceManager
     {
+        static readonly Logger logger;
+        static UnityDeviceManager()
+        {
+            logger = LogManager.GetCurrentClassLogger();
+        }
+                
+        private static DriveInfo GetKoboDriveInfo()
+        {
+            var drives = DriveInfo.GetDrives();
+            var nameToCheck = Settings.Default.Unity_Device_Default_VolumeLabel.ToLower();
+            foreach (var drive in drives)
+            {
+                var driveName = "uknown";
+                try
+                {
+                    driveName = drive.Name;
+                    logger.Trace("Drive with name {0}", driveName);
+                    var driveVolumeName = drive.VolumeLabel.ToLower();
+                    if(driveVolumeName == nameToCheck)
+                    {
+                        return drive;
+                    }
+                }
+                catch(Exception ex)
+                {   
+                    logger.Error("Error by comparing drive Volume Label.", ex);
+                }
+            }
+
+            return null;
+        }
+
         public static UnityDevice TryGetDeviceInformation()
         {
             var result = new UnityDevice();
-            var diskInfo = DriveInfo.GetDrives().FirstOrDefault(di => di.VolumeLabel.ToLower() == Settings.Default.Unity_Device_Default_VolumeLabel.ToLower());
+            //var diskInfo = DriveInfo.GetDrives().FirstOrDefault(di => di.VolumeLabel.ToLower() == Settings.Default.Unity_Device_Default_VolumeLabel.ToLower());
             //var diskInfo = DriveInfo.GetDrives().FirstOrDefault(di => di.VolumeLabel == "NEW");
+            var diskInfo = GetKoboDriveInfo();
+
             result.IsConnected = diskInfo != null;
 
             if (result.IsConnected)
