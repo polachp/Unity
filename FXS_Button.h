@@ -3,10 +3,9 @@
 
 #include <stdio.h>
 #include "Arduino.h"
+
 #define PULL_UP 1
 #define PULL_DOWN 0
-
-
 
 class Button
 {
@@ -66,5 +65,6 @@ class Button
 
 };
 #endif
+
 
 

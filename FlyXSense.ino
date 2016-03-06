@@ -1,16 +1,23 @@
 //=====================================================================================================
-//Fly X Sense project
+//UNITY project
 //=====================================================================================================
 
-#define DEBUG
-//#define VARIO_SOUND_TEST
-//#define DEBUGCOMPENSATEDCLIMBRATE
-//#define DEBUGOUTDATATOSERIAL
+#define VARIO
+#define GPS
+#define AIRSPEED
 
-#include <Arduino.h>
+//#define DEBUG
+//#define DEBUG_SOUND
+//#define DEBUG_COMMANDS
+//#define DEBUGOUTDATATOSERIAL
+//#define DEBUGCOMPENSATEDCLIMBRATE
+
 
 #include <SoftwareSerial.h>
-#include <HardwareSerial.h>
+//#include <avr/interrupt.h>
+//#include <avr/power.h>
+//#include <avr/sleep.h>
+
 #include <EEPROM.h>
 #include "FXS_EEPROMAnything.h"
 #include "DefaultValues.h"
@@ -20,35 +27,37 @@
 #include "FXS_sounds.h"
 #include "FXS_Button.h"
 #include "FXS_CompensatedVario.h"
-#include "TinyGPS.h"
 
 float actualPressure;
 Button button;
-SoftwareSerial softSerial(7,8); // RX, TX
-String gpsData="";
-String koboData="";
+SoftwareSerial softSerial(7, 8); // RX, TX
+String gpsData = "";
+String koboData = "";
 Sounds snd;
 ConfigManager config;
 MS5611 baro(I2C_MS5611_Add);
 bool initialized = false; //delayed initialization of GSPS com port to let the softserial time to load configuration after device start
 
 #ifdef AIRSPEED // differential pressure
-#define ALLOWMODESWITCH
 MS4525  airspd(I2C_4525_Add);
 FXS_CompensatedVario dteVario;
 #endif
 
-#ifdef VARIO_SOUND_TEST
-int vario = 0 ;
+#ifdef DEBUG_SOUND
+int vario = 0;
 #endif
 //loop timers
-unsigned long nextVarioDataUpdateMillis = 5000;
+unsigned long lastVarioDataTime = 5000;
+#ifdef DEBUGOUTDATATOSERIAL
+unsigned long lastOutupDataTime = 2000;
+#endif
 unsigned long nextGpsOutputTimeMillis = 5000;
 void setup()
 {
+	softSerial.begin(19200);
 	button.Configure(BUTTONPIN);
 	button.OnClick = OnClick;
-	button.OnLongPress= OnLongClick;
+	button.OnLongPress = OnLongClick;
 	button.OnVLongPress = VLongPress;
 	button.OnDblClick = OnDblClick;
 
@@ -57,16 +66,13 @@ void setup()
 	while (digitalRead(BUTTONPIN) == LOW)
 	{
 		i++;
-		snd.Play(700,1000);
-		delay(50*i);
+		snd.Play(700, 1000);
+		delay(50 * i);
 		noToneAC();
-		delay(1000-i*50);
-		if(i>=10) 
+		delay(1000 - i * 50);
+		if (i >= 10)
 		{
-			snd.SoundUp2();
-			snd.SoundUp2();
-			snd.SoundUp2(); 
-			snd.SoundUp2();
+			snd.Play(1500, 1000);
 			config.SetDefaults();
 			break;
 		}
@@ -77,89 +83,120 @@ void setup()
 #ifdef AIRSPEED
 	airspd.setup();
 #endif
-	config.LoadConfigToRuntime();
-	softSerial.begin(SERIAL_SPEED);
-}
 
+	config.LoadConfigToRuntime();
+
+#ifdef DEBUG_SOUND
+	config.data.RateMultiplier = 130;
+	snd.SetSound(true);
+	snd.BaseFreq = DEFAULTSOUNDBASEFREQ;
+	snd.Volume = 10;
+#endif
+}
 
 void loop() {
 	if (!initialized && millis() > SERIAL_COMM_DELAY)
 	{
+		softSerial.end();
+		softSerial.begin(9600);
+
+		String cmd = "";
+		cmd = "PMTK251,19200";
+		send_cmd(softSerial, cmd);
+
+		softSerial.begin(SERIAL_SPEED);
 		SetupGps();
 		Serial.begin(SERIAL_SPEED);
 		initialized = true;
 		config.Print(Serial);
 	}
-	readSensors(); //Executive part that reads all sensor values and process them  
-
-#ifdef VARIO_SOUND_TEST
-	snd.VarioSound(vario);
-#else
-#ifdef AIRSPEED
-	if (baro.varioData.climbRateAvailable && dteVario.compensatedClimbRateAvailable && config.data.VarioMode == 1)
-		snd.VarioSound( dteVario.compensatedClimbRate);
-	else
-		snd.VarioSound(baro.varioData.climbRate);
-#else
-	snd.VarioSound(baro.varioData.climbRate);
-#endif
-#endif
 	ProcessKobo();
+
 	if (initialized)
 	{
+#ifdef DEBUG_SOUND
+		//snd.ContinousVarioSound(vario);
+		snd.VarioSound(vario);
+#else
+
+#ifdef AIRSPEED
+		if (baro.varioData.climbRateAvailable && dteVario.compensatedClimbRateAvailable && config.data.VarioMode == compensated)
+		{
+			snd.VarioSound(dteVario.compensatedClimbRate);
+		}
+		else{
+			snd.VarioSound(baro.varioData.climbRate);
+		}
+#else
+		snd.VarioSound(baro.varioData.climbRate);
+#endif
+
+
+#endif
+
+		readSensors(); //Executive part that reads all sensor values and process them  
+
+#ifndef DEBUG_COMMANDS
 		ProcessGPS();
-		if ((millis() - nextVarioDataUpdateMillis) > VARIODATASENDINTERVAL)
+#endif
+		if ((millis() - lastVarioDataTime) > VARIODATASENDINTERVAL)
 		{
 			SendVarioData();
-			nextVarioDataUpdateMillis = millis();
+			lastVarioDataTime = millis();
 		}
+#ifdef DEBUGOUTDATATOSERIAL
+		if ((millis() - lastOutupDataTime) > 100)
+		{
+			OutputToSerial();
+			lastOutupDataTime = millis();
+		}
+#endif
+
 	}
 	button.CheckBP();
 }// LOOP
 
-// $LXWP0,logger_stored, airspeed, airaltitude,
-//   v1[0],v1[1],v1[2],v1[3],v1[4],v1[5], hdg, windspeed*CS<CR><LF>
 //
-// 0 loger_stored : [Y|N] (not used in LX1600)
-// 1 IAS [km/h] ----> Condor uses TAS!
-// 2 baroaltitude [m]
-// 3-8 vario values [m/s] (last 6 measurements in last second)
-// 9 heading of plane (not used in LX1600)
-// 10 windcourse [deg] (not used in LX1600)
-// 11 windspeed [km/h] (not used in LX1600)
-//
-// e.g.:
-// $LXWP0,Y,222.3,1665.5,1.71,,,,,,239,174,10.1
-String varioData = "";
+//// $LXWP0,logger_stored, airspeed, airaltitude,
+////   v1[0],v1[1],v1[2],v1[3],v1[4],v1[5], hdg, windspeed*CS<CR><LF>
+////
+//// 0 loger_stored : [Y|N] (not used in LX1600)
+//// 1 IAS [km/h] ----> Condor uses TAS!
+//// 2 baroaltitude [m]
+//// 3-8 vario values [m/s] (last 6 measurements in last second)
+//// 9 heading of plane (not used in LX1600)
+//// 10 windcourse [deg] (not used in LX1600)
+//// 11 windspeed [km/h] (not used in LX1600)
+////
+//// e.g.:
+//// $LXWP0,Y,222.3,1665.5,1.71,,,,,,239,174,10.1
+;
 void SendVarioData()
 {
 #ifndef DEBUGOUTDATATOSERIAL
+	static String varioData = "";
 	varioData = "LXWP0,N,";
 #ifdef AIRSPEED
 	varioData.concat(airspd.airSpeedData.airSpeedSM * 3.6 / 100);
 #endif
 	varioData.concat(",");
 	varioData.concat(baro.varioData.absoluteAlt / 100);
-	varioData.concat(",");
-	for (int i = 0; i < 6; i++)
-	{
+	varioData.concat(",,,,,,");
 #ifdef AIRSPEED
-		if (baro.varioData.climbRateAvailable && dteVario.compensatedClimbRateAvailable && config.data.VarioMode == compensated)
-		{
-			varioData.concat((float)dteVario.compensatedClimbRate / 100);
-		}
-		else{
-			varioData.concat((float)baro.varioData.climbRateSM / 100);
-		}
-#else
-		varioData.concat((float)baro.varioData.climbRateSM / 100);
-#endif
-		varioData.concat(",");
+	if (baro.varioData.climbRateAvailable && dteVario.compensatedClimbRateAvailable && config.data.VarioMode == compensated)
+	{
+		varioData.concat(dteVario.compensatedClimbRate / 100.0f);
 	}
-
-	varioData.concat(",,,");
+	else{
+		varioData.concat(baro.varioData.climbRateSM / 100.0f);
+	}
+#else
+	//varioData.concat(vario/100.0f);
+	varioData.concat(baro.varioData.climbRateSM / 100.0f);
+#endif
+	varioData.concat(",,,,");
 	send_cmd(Serial, varioData);
-#endif //debug
+#endif //DEBUGOUTDATATOSERIAL
 }
 
 void send_cmd(Stream &icf, String &cmd) {
@@ -179,92 +216,92 @@ void SetupGps(){
 
 	String cmd = "";
 
-	//cmd = "PMTK869,1,1"; 
-	//send_cmd(softSerial,cmd);
-
-	//cmd = "PMTK314,0,1,1,1,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0"; with speed sentence
-
-	cmd = "PMTK314,0,1,0,1,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0"; //without speed sentences
+	cmd = "PMTK314,0,1,0,1,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0"; //without speed sentences
 	send_cmd(softSerial, cmd);
 
-	cmd = "PMTK220,250";  
+	cmd = "PMTK220,500";
 	send_cmd(softSerial, cmd);
+}
 
-	cmd = "PMTK225,0"; 
-	send_cmd(softSerial, cmd);
-
-	cmd = "PMTK301,2";  //sbas
-	send_cmd(softSerial, cmd);
-
-	cmd = "PMTK313,1"; //waas
-	send_cmd(softSerial, cmd);
-
-	cmd = "PMTK513,1"; //waas
-	send_cmd(softSerial, cmd);
-
-	cmd = "PMTK313,1"; //waas
-	send_cmd(softSerial, cmd);
-
-	//cmd = "PMTK251,19200";
+void SleepMode(){
+	//String cmd = "";
+	//cmd = "PMTK161,0";
 	//send_cmd(softSerial, cmd);
 
-	//Serial.begin(GPS_SERIAL_SPEED);
+	//for (int x = 1; x < 20; x++){
+	//	pinMode(x, INPUT);
+	//	digitalWrite(x, LOW);
+	//}
+	//digitalWrite(13, LOW);
+	//byte adcsra, mcucr1, mcucr2;
+	//sleep_enable();
+	//set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+	//adcsra = ADCSRA;               //save the ADC Control and Status Register A
+	//ADCSRA = 0;                    //disable ADC
+	//cli();
+	//EIMSK |= _BV(INT0);            //enable INT0
+	//mcucr1 = MCUCR | _BV(BODS) | _BV(BODSE);  //turn off the brown-out detector
+	//mcucr2 = mcucr1 & ~_BV(BODSE);
+	//MCUCR = mcucr1;
+	//MCUCR = mcucr2;
+	//sei();                         //ensure interrupts enabled so we can wake up again
+	//sleep_cpu();                   //go to sleep
 }
 
 void ProcessGPS()
-{ 
-	while (Serial.available())
+{
+	while (Serial.available() > 0)
 	{
 		char in = Serial.read();
-	    if (in == '$') {
+		if (in == '$') {
 			Serial.println(gpsData);
 			gpsData = "$";
-		} 
+		}
 		else if (in != '\n') {
 			gpsData.concat(in);
-		} 
+		}
 	}
 }
 
-#ifdef DEBUG
+#ifdef DEBUG_COMMANDS
 Stream &inputStream = Serial;
 #else
 Stream &inputStream = softSerial;
 #endif
 void ProcessKobo()
-{ 
-	while (inputStream.available())
+{
+	while (inputStream.available() > 0)
 	{
 		char in = inputStream.read();
 		if (in == '*') {
 			koboData.concat(in);
-			config.ProcessSetCommand(koboData); 
+			config.ProcessSetCommand(koboData);
 			koboData = "";
-		} 
+		}
 		else if (in != '\n') {
 			koboData.concat(in);
-		} 
+		}
 	}
 }
 
 bool Contains(String s, String search) {
-	return s.indexOf(search) >=0;
-} 
+	return s.indexOf(search) >= 0;
+}
 
 void readSensors() {
 #ifdef AIRSPEED
-	if(dteVario.compensatedClimbRateAvailable && config.data.VarioMode == 1) // read speed sensor twice only for vario compensated mode purposes
+	if (dteVario.compensatedClimbRateAvailable && config.data.VarioMode == 1) // read speed sensor twice only for vario compensated mode purposes
 	{
 		airspd.readSensor();
 	}
 
 #endif
 	baro.readSensor();
-	if ( baro.varioData.absoluteAltAvailable == true && baro.varioData.rawPressure > 100000.0f ) actualPressure = baro.varioData.rawPressure / 10000.0 ;
+	if (baro.varioData.absoluteAltAvailable == true && baro.varioData.rawPressure > 100000) actualPressure = baro.varioData.rawPressure / 10000.0;
 
 #ifdef AIRSPEED
 	airspd.readSensor(); //reread senson to provide more data
-	if ( baro.varioData.altitudeAt20MsecAvailable == true )
+	if (baro.varioData.altitudeAt20MsecAvailable == true)
 	{
 		dteVario.CalculateDte();
 	}
@@ -275,9 +312,8 @@ void readSensors() {
 //button handlers section
 //=====================================================================================================
 void OnDblClick(int pin) {
-#ifdef VARIO_SOUND_TEST
-	vario = 0;
-	Serial.println(0);
+#ifdef DEBUG_SOUND
+	vario = vario - 30;
 	return;
 #endif
 	snd.SetSound(!snd.SoundOn);
@@ -285,22 +321,20 @@ void OnDblClick(int pin) {
 	config.Save();
 }
 
-int ii = 0;
 void OnClick(int pin)
-{ 
-#ifdef VARIO_SOUND_TEST
+{
+#ifdef DEBUG_SOUND
 	/*snd.PlayLKSound(ii);
 	if (ii>17) {ii=0;return;}
 	ii++;
 	return;*/
 
-	vario = vario+20;
-	Serial.println(vario/100.0);
+	vario = vario + 30;
+	Serial.println(vario / 100.0);
 	return;
 
 #endif
-
-	if (!snd.SoundOn) 
+	if (!snd.SoundOn)
 	{
 		snd.SetSound(true);
 		config.data.SoundOn = true;
@@ -308,31 +342,36 @@ void OnClick(int pin)
 		return;
 	}
 
-	if (snd.Volume == 10)	
+	if (snd.Volume == 10)
 	{
 		snd.Volume = config.data.LowSoundVolume;
 		snd.BaseFreq = config.data.LowBaseFreq;
 		snd.SoundDn2();
-	}else{
+	}
+	else{
 		snd.Volume = 10;
-		snd.BaseFreq =config.data.BaseFreq;
+		snd.BaseFreq = config.data.BaseFreq;
 		snd.SoundUp2();
 	}
 
-	config.data.Volume=snd.Volume;
+	config.data.Volume = snd.Volume;
 	config.Save();
 }
 
 void OnLongClick(int pin)
 {
-#ifdef ALLOWMODESWITCH
-	if (config.data.VarioMode==compensated)
+#ifdef AIRSPEED
+	if (config.data.VarioMode == compensated)
 	{
 		config.SetVarioMode(normal);
 	}
 	else{
-		config.	SetVarioMode(compensated);
+		config.SetVarioMode(compensated);
 	}
+#else
+	//snd.continous = !snd.continous;
+	//snd.SoundUp2();
+	//snd.SoundDn2();
 #endif
 }
 
@@ -340,37 +379,39 @@ void VLongPress(int pin)
 {
 #ifdef AIRSPEED
 	//airspeeed sensor for proper null airspeed
-	snd.Play(600,200);
-	delay(500);
-	snd.Play(600,200);
-	delay(500);
-	snd.Play(700,1000);
-	delay(800);
-	airspd.airSpeedData.airspeedReset=true;
+	snd.Play(300, 200);
+	delay(400);
+	snd.Play(300, 200);
+	delay(400);
+	snd.Play(500, 1000);
+	delay(400);
+	airspd.airSpeedData.airspeedReset = true;
 	delay(200);
 	noToneAC();
 #endif
 }
 
-#ifdef DEBUG
+#ifdef DEBUGOUTDATATOSERIAL
 
 //used for debuging and testing
 void OutputToSerial()
 {
-	return;
 	//Serial.print( airspd.airSpeedData.airSpeed * 3.6/100);
 	//Serial.print(F(","));
-	Serial.print( airspd.airSpeedData.airSpeed * 3.6 / 100);
+	Serial.print(airspd.airSpeedData.airSpeedSM * 3.6 / 100);
 	Serial.print(F(", "));
-	Serial.print( ( (float)baro.varioData.climbRate) / 100);
+	Serial.print(((float)baro.varioData.climbRate) / 100);
 	Serial.print(F(", "));
-	Serial.print( ( (float)baro.varioData.climbRateSM) / 100);
+	Serial.print(((float)baro.varioData.climbRateSM) / 100);
 	Serial.print(F(", "));
-	Serial.print( ( (float)baro.varioData.absoluteAlt) / 100);
+
+	Serial.print((float)dteVario.compensatedClimbRate / 100);
 	Serial.print(F(","));
-	//Serial.print( (float)compensatedClimbRate / 100);
+
+	Serial.print(((float)baro.varioData.absoluteAlt) / 100);
 	Serial.print(F(","));
-	//   Serial.print( (float)rawTotalEnergy);
+
+	Serial.print((float)dteVario.rawTotalEnergy);
 	Serial.println("");
 	//Serial.print(F(","));
 	//Serial.print( (airspd.airSpeedData.temperature4525) -273.15);
@@ -378,4 +419,5 @@ void OutputToSerial()
 	//Serial.print( baro.varioData.temperature/100.0);
 }
 #endif // OutputToSerial
+
 

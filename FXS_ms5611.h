@@ -1,7 +1,6 @@
 #ifndef FXS_MS5611_h
 #define FXS_MS5611_h
 
-#include "Arduino.h"
 #include "DefaultValues.h"
 #include "FXS_I2C.h"
 #include "FXS_KalmanFilter.h"
@@ -14,11 +13,11 @@ struct VARIODATA {
   int32_t absoluteAlt;     // in cm  * 100
   bool absoluteAltAvailable ;
   bool altitudeAt20MsecAvailable   ;  // use to say to readsensors() that an altitude is available and that dte can be calculated.
-
   float delaySmooth ; // smoothed delay between 2 altitude calculations
 
   int32_t climbRate;       // in cm /sec = vertical speed
   int32_t climbRateSM;
+  int32_t climbRates[6];
   bool climbRateAvailable ;
   bool switchClimbRateAvailable ; // use to say to the readsensors loop that that a climbrate is available (to select the one being send)
 
@@ -68,13 +67,11 @@ class MS5611 {
     float climbRateFloat  ;
 //    float abs_deltaClimbRate ;
 
-#ifdef DEBUG
-    HardwareSerial* printer;
-#endif
 }; // end class MS5611
 
 
 #endif // MS5611
+
 
 
 

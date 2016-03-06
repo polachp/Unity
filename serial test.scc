@@ -1,6 +1,6 @@
 [_setup_]
 port=COM7  
-baudrate=115200
+baudrate=19200
 
 width=1200
 height=201
@@ -20,13 +20,13 @@ grid_v_origin_color = transparent
 min=-2
 max=2
 
-[test1]
-color=transparent
+[AIRSPEED]
+color=black
 
-[test2]
+[CLIMBRATE]
 color=red
 
-[test3]
+[CLIMBRATE SM]
 color=blue
 
 

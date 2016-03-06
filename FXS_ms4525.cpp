@@ -5,10 +5,6 @@
 #define FILTERING4525_ADC_MIN_AT       10 // when abs(delta between ADC and current value) is less than MIN_AT , apply MIN  
 #define FILTERING4525_ADC_MAX_AT       100 // when abs(delta between ADC and current value) is more than MAX_AT , apply MAX (interpolation in between)
 
-extern unsigned long micros( void ) ;
-extern unsigned long millis( void ) ;
-extern void delay(unsigned long ms) ;
-
 MS4525::MS4525(uint8_t addr)
 { // constructor
 	_addr = addr;
@@ -54,7 +50,6 @@ void MS4525::setCalibration(int a,int b)
 /****************************************************************************/
 void MS4525::readSensor() {
 	static int32_t difPressureAdc4Values[4] = { 0, 0, 0, 0 };
-
 	static int32_t difPressureAdcSum4Values;
 	static int8_t countAverage ;
 	I2CErrorCode4525 = I2c.read( _addr,  2 ) ; //read 2 bytes from the device;
@@ -129,6 +124,7 @@ void MS4525::readSensor() {
 
 
 } // End of readSensor
+
 
 
 

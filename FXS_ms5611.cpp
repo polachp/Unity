@@ -1,8 +1,5 @@
 #include "FXS_ms5611.h"
 
-extern unsigned long micros( void ) ;
-extern unsigned long millis( void ) ;
-extern void delay(unsigned long ms) ;
 
 MS5611::MS5611(uint8_t addr)
 {
@@ -13,8 +10,8 @@ MS5611::MS5611(uint8_t addr)
 
 // **************** Setup the MS5611 sensor *********************
 void MS5611::setup() {
-  kalmanVario = KalmanFilter(0.0002f,0.05f);
-  varioData.sensitivity = SENSITIVITY_MIN;
+	kalmanVario = KalmanFilter(0.000025f, 0.02f);
+  varioData.sensitivity = map(SENSITIVITY_MIN, 0, 100, 30, 120);
   varioData.absoluteAltAvailable=false ;
   varioData.climbRateAvailable = false ;
   varioData.delaySmooth = 20000 ; // delay between 2 altitude calculation = 20msec = 20000 usec
@@ -97,7 +94,9 @@ void MS5611::readSensor() {
       D2Prev = D2 ;
       dT = D2Apply - ((long)_calibrationData[5] << 8);
       TEMP = (2000 + (((int64_t)dT * (int64_t)_calibrationData[6]) >> 23)) / (float) 1.0 ;
-      varioData.temperature = TEMP;
+      
+	  varioData.temperature = TEMP;
+
       OFF  = (((int64_t)_calibrationData[2]) << 16) + ((_calibrationData[4] * dT) >> 7);
       SENS = (((int64_t)_calibrationData[1]) << 15) + ((_calibrationData[3] * dT) >> 8);
       varioData.rawPressure = (((((((int64_t) D1) * (int64_t) SENS) >> 21) - OFF) * 10000 ) >> 15) ; // 1013.25 mb gives 1013250000 is a factor to keep higher precision (=1/100 cm).
@@ -149,6 +148,7 @@ void MS5611::readSensor() {
     }  // end of D1 > 0 & time > 3 sec
   } // End of process if SensorState was 0
 } // End of readSensor
+
 
 
 

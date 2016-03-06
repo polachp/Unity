@@ -49,6 +49,8 @@
             this.writeConfigToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveScriptFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openScriptFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.deviceToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.quitToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.configurationControl = new UnityConfig.ConfigurationControl();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -56,11 +58,11 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.unityToolStripMenuItem,
             this.fileToolStripMenuItem,
             this.toolsToolStripMenuItem,
             this.languagesToolStripMenuItem,
-            this.helpToolStripMenuItem,
-            this.unityToolStripMenuItem});
+            this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(453, 24);
@@ -77,6 +79,7 @@
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
+            this.fileToolStripMenuItem.Visible = false;
             // 
             // importScriptToolStripMenuItem
             // 
@@ -118,14 +121,14 @@
             // settingToolStripMenuItem
             // 
             this.settingToolStripMenuItem.Name = "settingToolStripMenuItem";
-            this.settingToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.settingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.settingToolStripMenuItem.Text = "Setting";
             this.settingToolStripMenuItem.Click += new System.EventHandler(this.settingToolStripMenuItem_Click);
             // 
             // refreshDeviceToolStripMenuItem
             // 
             this.refreshDeviceToolStripMenuItem.Name = "refreshDeviceToolStripMenuItem";
-            this.refreshDeviceToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.refreshDeviceToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.refreshDeviceToolStripMenuItem.Text = "Refresh device";
             this.refreshDeviceToolStripMenuItem.Click += new System.EventHandler(this.refreshDeviceToolStripMenuItem_Click);
             // 
@@ -133,7 +136,8 @@
             // 
             this.languagesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.englishToolStripMenuItem,
-            this.czechToolStripMenuItem});
+            this.czechToolStripMenuItem,
+            this.deviceToolStripMenuItem1});
             this.languagesToolStripMenuItem.Name = "languagesToolStripMenuItem";
             this.languagesToolStripMenuItem.Size = new System.Drawing.Size(76, 20);
             this.languagesToolStripMenuItem.Text = "Languages";
@@ -142,14 +146,14 @@
             // englishToolStripMenuItem
             // 
             this.englishToolStripMenuItem.Name = "englishToolStripMenuItem";
-            this.englishToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.englishToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.englishToolStripMenuItem.Text = "English";
             this.englishToolStripMenuItem.Click += new System.EventHandler(this.englishToolStripMenuItem_Click);
             // 
             // czechToolStripMenuItem
             // 
             this.czechToolStripMenuItem.Name = "czechToolStripMenuItem";
-            this.czechToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.czechToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.czechToolStripMenuItem.Text = "Czech";
             this.czechToolStripMenuItem.Click += new System.EventHandler(this.czechToolStripMenuItem_Click);
             // 
@@ -164,7 +168,7 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
@@ -173,7 +177,8 @@
             this.unityToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.deviceToolStripMenuItem,
             this.readConfigToolStripMenuItem,
-            this.writeConfigToolStripMenuItem});
+            this.writeConfigToolStripMenuItem,
+            this.quitToolStripMenuItem1});
             this.unityToolStripMenuItem.Name = "unityToolStripMenuItem";
             this.unityToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.unityToolStripMenuItem.Text = "Unity";
@@ -181,21 +186,21 @@
             // deviceToolStripMenuItem
             // 
             this.deviceToolStripMenuItem.Name = "deviceToolStripMenuItem";
-            this.deviceToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.deviceToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.deviceToolStripMenuItem.Text = "Device";
             this.deviceToolStripMenuItem.Click += new System.EventHandler(this.deviceToolStripMenuItem_Click);
             // 
             // readConfigToolStripMenuItem
             // 
             this.readConfigToolStripMenuItem.Name = "readConfigToolStripMenuItem";
-            this.readConfigToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.readConfigToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.readConfigToolStripMenuItem.Text = "Read Config";
             this.readConfigToolStripMenuItem.Click += new System.EventHandler(this.readConfigToolStripMenuItem_Click);
             // 
             // writeConfigToolStripMenuItem
             // 
             this.writeConfigToolStripMenuItem.Name = "writeConfigToolStripMenuItem";
-            this.writeConfigToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.writeConfigToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.writeConfigToolStripMenuItem.Text = "Write Config";
             this.writeConfigToolStripMenuItem.Click += new System.EventHandler(this.writeConfigToolStripMenuItem_Click);
             // 
@@ -210,6 +215,18 @@
             // 
             this.openScriptFileDialog.DefaultExt = "sh";
             this.openScriptFileDialog.Filter = "Unity Config Files|*.sh";
+            // 
+            // deviceToolStripMenuItem1
+            // 
+            this.deviceToolStripMenuItem1.Name = "deviceToolStripMenuItem1";
+            this.deviceToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.deviceToolStripMenuItem1.Text = "Device";
+            // 
+            // quitToolStripMenuItem1
+            // 
+            this.quitToolStripMenuItem1.Name = "quitToolStripMenuItem1";
+            this.quitToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.quitToolStripMenuItem1.Text = "Quit";
             // 
             // configurationControl
             // 
@@ -263,6 +280,8 @@
         private System.Windows.Forms.ToolStripMenuItem readConfigToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem writeConfigToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deviceToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deviceToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem quitToolStripMenuItem1;
     }
 }
 

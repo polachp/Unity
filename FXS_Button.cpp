@@ -6,7 +6,7 @@ Button:: Button()
   // Initialization of properties
   Debounce = 20;
   DblClickDelay = 250;
-  LongPressDelay = 2000;
+  LongPressDelay = 1000;
   VLongPressDelay = 4000;
  
   // Initialization of variables
@@ -114,3 +114,4 @@ void Button::CheckBP(void)
   if (resultEvent == 3 && OnLongPress) OnLongPress(_pin);
   if (resultEvent == 4 && OnVLongPress) OnVLongPress(_pin);
   }
+

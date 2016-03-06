@@ -2,7 +2,6 @@
 #define FXS_MS4525_h
 
 #include <Arduino.h>
-//#include "FXS_config.h"
 #include "FXS_I2C.h"
 #include "FXS_KalmanFilter.h"
 
@@ -73,6 +72,7 @@ class MS4525 {
 //extern bool test3ValueAvailable ;
 
 #endif // MS4525
+
 
 
 

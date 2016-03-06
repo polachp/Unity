@@ -7,8 +7,7 @@
 #include "FXS_sounds.h"
 #include "FXS_EEPROMAnything.h"
 #include <Arduino.h>
-
-#define SCHEMAVERSION 2 //this version must be changed when configuration structure changes! (causes reset of params while loading them)
+ //this version must be changed when configuration structure changes! (causes reset of params while loading them)
 struct Configuration
 {
 	int SchemaVersion;
@@ -25,11 +24,8 @@ struct Configuration
 	int SpeedCalibrationA;
 	int SpeedCalibrationB;
 	int Sensitivity;
+	int Compesation;
 };
-
-//#define VARIO
-//#define GPS
-#define AIRSPEED
 
 extern MS5611 baro;
 extern Sounds snd;
@@ -62,8 +58,9 @@ private:
 	int GetValue(String s);
 };
 
-#include "HardwareSerial.h"
+//#include "HardwareSerial.h"
 #endif 
+
 
 
 

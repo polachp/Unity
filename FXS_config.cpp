@@ -1,6 +1,8 @@
 #include "FXS_config.h"
 
+
 extern bool Contains(String s, String search);
+extern void SleepMode();
 
 ConfigManager::ConfigManager()
 {
@@ -25,7 +27,7 @@ void ConfigManager::SetVarioMode(byte m)
 	if (m == normal) 
 	{
 		data.VarioMode = normal;
-		snd.SoundUp2();
+		snd.SoundUp();
 	}else{
 		data.VarioMode = compensated;
 		snd.SoundUp2();
@@ -34,16 +36,22 @@ void ConfigManager::SetVarioMode(byte m)
 	Save();
 }
 
+int MapSensitivity(int sen)
+{
+	return map(sen, 0, 100, 30, 120);
+}
+
 void ConfigManager::LoadConfigToRuntime()
 {
 	Load();
-	baro.varioData.sensitivity = map(data.Sensitivity,0,100,30,140);
+	baro.varioData.sensitivity = MapSensitivity(data.Sensitivity);
 	snd.Setup(data.LiftTreshold,data.SinkTreshold);   
 	snd.SoundOn = data.SoundOn;
 	snd.Volume = data.Volume;
 	if (snd.Volume<10) snd.BaseFreq = data.LowBaseFreq; // in case of lower sount than max we use lower base freq mode
 #ifdef AIRSPEED
 	airspd.setCalibration(data.SpeedCalibrationA,data.SpeedCalibrationB);  
+	SetVarioMode(data.VarioMode);
 #endif
 #ifdef ALLOWMODESWITCH
 	SetVarioMode(data.VarioMode);
@@ -67,19 +75,19 @@ void ConfigManager::SetDefaults()
 	data.RateMultiplier = DEFAULT_SOUND_RATE_MULTIPLIER;
 	data.SpeedCalibrationA= SPEEDCALIBRATION_A;
 	data.SpeedCalibrationB= SPEEDCALIBRATION_B;
-	data.Sensitivity = 50;
+	data.Sensitivity = 65;
+	data.Compesation = COMPENSATION;
 	EEPROM_writeAnything(0, data);
 }
 
 void ConfigManager::ProcessSetCommand(String sentence)
 {
 	int value = 0;
-
 	if (Contains(sentence,"UNSAVE"))
 	{
 		Save();
 		snd.Sonar(3);
-		return;
+	    return;
 	}
 
 	if (Contains(sentence,"UNRESET"))
@@ -112,16 +120,23 @@ void ConfigManager::ProcessSetCommand(String sentence)
 	if (Contains(sentence,"UNBF"))
 	{
 		value = GetValue(sentence);
-		value = constrain(value,500,3000);
+		value = constrain(value,350,3000);
 		data.BaseFreq=value;
 		snd.BaseFreq=value;
 		return;
 	}
 
-	if (Contains(sentence,"UNLBF"))
+	if (Contains(sentence, "UNCMP"))
 	{
 		value = GetValue(sentence);
-		value = constrain(value,500,3000);
+		data.Compesation = constrain(value, 80, 140);
+		return;
+	}
+
+
+	if (Contains(sentence,"UNLBF"))
+	{
+		value = constrain(GetValue(sentence), 350, 3000);
 		data.LowBaseFreq=value;
 		snd.BaseFreq=value;
 		return;
@@ -129,40 +144,42 @@ void ConfigManager::ProcessSetCommand(String sentence)
 
 	if (Contains(sentence,"UNLV"))
 	{
-		value = GetValue(sentence);
-		value = constrain(value,1,9);
+		value = constrain(GetValue(sentence), 1, 9);
 		data.LowSoundVolume =value;
 		return;
 	}
 
 	if (Contains(sentence,"UNAV"))
 	{
-		value = GetValue(sentence);
-		value = constrain(value,9,10);
+		value = constrain(GetValue(sentence), 9, 10);
 		data.AlarmsVolume =value;
 		return;
 	}
 
 	if (Contains(sentence,"UNBR"))
 	{
-		value = GetValue(sentence);
-		value = constrain(value,70,130);
+		value = constrain(GetValue(sentence), 70, 130);
 		data.RateMultiplier =value;
 		return;
 	}
 
 	if (Contains(sentence,"UNSEN"))
 	{
-		value = GetValue(sentence);
-		value = constrain(value,0,100);
+		value = constrain(GetValue(sentence), 0, 100);
 		data.Sensitivity = value;
-		baro.varioData.sensitivity = map(value,0,100,30,140);
+		baro.varioData.sensitivity = MapSensitivity(data.Sensitivity);;
+		return;
+	}
+
+	if (Contains(sentence,"UNSLP"))
+	{
+	    SleepMode();
 		return;
 	}
 
 	if (Contains(sentence,"UNSPA"))
 	{
-		value = GetValue(sentence);
+		value = constrain(GetValue(sentence),50,150);
 		data.SpeedCalibrationA = value;
 #ifdef AIRSPEED
 		airspd.setCalibration(data.SpeedCalibrationA,data.SpeedCalibrationB);
@@ -172,11 +189,34 @@ void ConfigManager::ProcessSetCommand(String sentence)
 
 	if (Contains(sentence,"UNSPB"))
 	{
-		value = GetValue(sentence);
+		value = constrain(GetValue(sentence), -20, 20);
 		data.SpeedCalibrationB = value;
 #ifdef AIRSPEED
 		airspd.setCalibration(data.SpeedCalibrationA,data.SpeedCalibrationB);
 #endif
+		return;
+	}
+	
+	if (Contains(sentence, "UNSB")) //"$UNSB,1600,500,3,50*"  tone, ms,repeats, pause
+	{
+		byte lastVolume = snd.Volume;
+		snd.Volume = data.AlarmsVolume;
+		int a = sentence.indexOf(",");
+		int aa = sentence.indexOf(",", a + 1);
+		int tone = sentence.substring(a + 1, aa).toInt();
+	
+		a = sentence.indexOf(",", aa + 1);
+		int ms = sentence.substring(aa + 1, a).toInt();
+		
+		aa = sentence.indexOf(",", a + 1);
+		int rep = sentence.substring(a + 1, aa).toInt();
+
+		a = sentence.indexOf("*", aa + 1);
+		int pause = sentence.substring(aa + 1, a).toInt();
+
+		snd.PlayBeeps(tone,ms,rep,pause);
+
+		snd.Volume = lastVolume;
 		return;
 	}
 
@@ -186,7 +226,10 @@ void ConfigManager::ProcessSetCommand(String sentence)
 		snd.Volume = data.AlarmsVolume;
 		snd.PlayLKSound(GetValue(sentence));
 		snd.Volume = lastVolume;
+		return;
 	}
+
+	
 }
 
 int ConfigManager::GetValue(String s)
@@ -195,6 +238,7 @@ int ConfigManager::GetValue(String s)
 	int ii = s.indexOf("*");
 	return s.substring(i+1,ii).toInt();
 }
+
 
 void ConfigManager::Print(Stream &icf)
 {
@@ -231,10 +275,12 @@ void ConfigManager::Print(Stream &icf)
 	icf.print("Sensitivity:");
 	icf.println(data.Sensitivity);
 
-
+	icf.print("Compensation:");
+	icf.println(data.Compesation);
 	icf.print("SpeedCalibrationA:");
 	icf.println(data.SpeedCalibrationA);
 	icf.print("SpeedCalibrationB:");
 	icf.println(data.SpeedCalibrationB);
 }
+
 
