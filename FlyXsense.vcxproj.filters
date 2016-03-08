@@ -45,9 +45,6 @@
     <ClCompile Include="FXS_config.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TinyGPS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FXS_Button.h">
@@ -86,10 +83,7 @@
     <ClInclude Include="Visual Micro\._PROJECT.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TinyGPS.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="__vm\._PROJECT.vsarduino.h">
+    <ClInclude Include="__vm\._Project.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

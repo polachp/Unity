@@ -16,8 +16,6 @@ private:
 	int freq;
 	unsigned long  beep;
 	unsigned long  cadence;
-	int32_t vario_climb_rate_start;
-	int32_t vario_sink_rate_start ;
 	void SlideSound(int start,int high,int raiseStep,int delayTime);
 
 public:
@@ -26,7 +24,6 @@ public:
 	boolean SoundOn;
 	int BaseFreq;
 	uint8_t Volume;
-	void Setup(int32_t climb_rate_start, int32_t sink_rate_start);
 	void SetSound(boolean enabled);
 	void VarioSound(int32_t climbRate);
 

@@ -6,23 +6,15 @@ Sounds::Sounds()
 {
 	SoundOn = true;
 	Volume = 10;
-	vario_climb_rate_start = DEFAULT_LIFT_TRESHOLD;
-	vario_sink_rate_start = DEFAULT_SINK_TRESHOLD;
 	BaseFreq = DEFAULTSOUNDBASEFREQ;
 	continous = false;
-}
-
-void Sounds::Setup(int32_t climb_rate_start, int32_t sink_rate_start) {
-	vario_climb_rate_start = climb_rate_start;
-	vario_sink_rate_start = sink_rate_start;
 }
 
 void Sounds::SetSound(boolean enabled) {
 	SoundOn = enabled;
 	if (enabled) SoundUp();
 	else
-	  SoundDn();
-	
+		SoundDn();
 }
 
 //////////////////////////////////////
@@ -38,7 +30,7 @@ void Sounds::VarioSound(int32_t climbRate) {
 	if (((_now - beep) > cadence) && SoundOn)
 	{
 		beep = _now;
-		if (climbRate >= vario_climb_rate_start)
+		if (climbRate >= config.data.LiftTreshold)
 		{
 			i = 0;
 			freqShift = -100;
@@ -48,14 +40,14 @@ void Sounds::VarioSound(int32_t climbRate) {
 	}
 
 	if (!SoundOn) return;
-	if (climbRate <= vario_sink_rate_start)
+	if (climbRate <= config.data.SinkTreshold)
 	{
-		freq = map(climbRate, -800, vario_climb_rate_start, 60, 220);
+		freq = map(climbRate, -800, config.data.SinkTreshold, 60, 220);
 		toneAC(freq, Volume, 1000, true);
 		return;
 	}
 
-	if (millis() < endBeep  && climbRate >= vario_climb_rate_start)
+	if (millis() < endBeep  && climbRate >= config.data.LiftTreshold)
 	{
 
 		if (climbRate < 100 && i < 250)
@@ -65,7 +57,7 @@ void Sounds::VarioSound(int32_t climbRate) {
 				freqShift = freqShift + 1;
 		}
 
-		freq = map(climbRate, vario_climb_rate_start, 800, BaseFreq, BaseFreq + FREQ_RAISE);
+		freq = map(climbRate, config.data.LiftTreshold, 800, BaseFreq, BaseFreq + FREQ_RAISE);
 		freq = constrain(freq, 200, BaseFreq + FREQ_RAISE + 100);
 		toneAC(freq + freqShift, Volume, 5000, true);
 	}
@@ -74,14 +66,12 @@ void Sounds::VarioSound(int32_t climbRate) {
 	}
 }
 
-
-
 int Sounds::period(int32_t climbRate) {
-	 int value;
-	 float mod = (config.data.RateMultiplier / 100.0f); // speed modifier
+	int value;
+	float mod = (config.data.RateMultiplier / 100.0f); // speed modifier
 	if (climbRate < X)
 	{
-		value = map(climbRate, vario_climb_rate_start, X, (MAX + T1)*mod, (MID + T2)*mod);
+		value = map(climbRate, config.data.LiftTreshold, X, (MAX + T1)*mod, (MID + T2)*mod);
 	}
 	else
 	{
@@ -95,11 +85,11 @@ int Sounds::period(int32_t climbRate) {
 }
 
 int Sounds::beepDuration(int32_t climbRate) {
-	 int value;
-	 float mod = (config.data.RateMultiplier / 100.0f);
+	int value;
+	float mod = (config.data.RateMultiplier / 100.0f);
 	if (climbRate < X)
 	{
-		return value = map(climbRate, vario_climb_rate_start, X, MAX*mod, MID);
+		return value = map(climbRate, config.data.LiftTreshold, X, MAX*mod, MID);
 	}
 	else
 	{
@@ -120,13 +110,11 @@ void Sounds::Play(int note, int ms) {
 }
 
 void Sounds::PlayBeeps(int note, int ms, int repeats, int pause){
-	repeats = constrain(repeats, 1, 100);
-	 int starttime = millis();
+	repeats = repeats;
 	for (int i = 1; i <= repeats; i++)
 	{
-		toneAC(note, Volume, constrain(ms, 1, 1000), false);
-		delay(constrain(pause, 0, 300));
-		if (abs(millis() - starttime) > 4000) return;
+		toneAC(note, Volume, ms, false);
+		delay(pause);
 	}
 }
 
@@ -217,7 +205,8 @@ void Sounds::Alarm(byte rings) {
 void Sounds::Sonar(int level)
 {
 	int freq = 2400 + (level * 80);
-	toneAC(freq, Volume, 100, true); delay(80 + (level * 15));
+	toneAC(freq, Volume, 100, true); 
+	delay(80 + (level * 15));
 	SlideSound(freq, 4000, 15, 1);
 }
 

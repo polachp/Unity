@@ -1,6 +1,5 @@
 #include "FXS_config.h"
 
-
 extern bool Contains(String s, String search);
 extern void SleepMode();
 
@@ -45,7 +44,6 @@ void ConfigManager::LoadConfigToRuntime()
 {
 	Load();
 	baro.varioData.sensitivity = MapSensitivity(data.Sensitivity);
-	snd.Setup(data.LiftTreshold,data.SinkTreshold);   
 	snd.SoundOn = data.SoundOn;
 	snd.Volume = data.Volume;
 	if (snd.Volume<10) snd.BaseFreq = data.LowBaseFreq; // in case of lower sount than max we use lower base freq mode
@@ -94,10 +92,6 @@ void ConfigManager::ProcessSetCommand(String sentence)
 	{
 		SetDefaults();
 		Save();
-		snd.SoundUp2();
-		snd.SoundUp2();
-		snd.SoundUp2(); 
-		snd.SoundUp2();
 		return;
 	}
 
@@ -105,7 +99,6 @@ void ConfigManager::ProcessSetCommand(String sentence)
 	{
 		value = GetValue(sentence);
 		data.LiftTreshold=abs(value);
-		snd.Setup(data.LiftTreshold,data.SinkTreshold);   
 		return;
 	}
 
@@ -113,7 +106,6 @@ void ConfigManager::ProcessSetCommand(String sentence)
 	{
 		value = GetValue(sentence);
 		data.SinkTreshold=abs(value)*-1;
-		snd.Setup(data.LiftTreshold,data.SinkTreshold);   
 		return;
 	}
 
@@ -197,9 +189,10 @@ void ConfigManager::ProcessSetCommand(String sentence)
 		return;
 	}
 	
+	byte lastVolume;
 	if (Contains(sentence, "UNSB")) //"$UNSB,1600,500,3,50*"  tone, ms,repeats, pause
 	{
-		byte lastVolume = snd.Volume;
+		lastVolume = snd.Volume;
 		snd.Volume = data.AlarmsVolume;
 		int a = sentence.indexOf(",");
 		int aa = sentence.indexOf(",", a + 1);
@@ -222,7 +215,7 @@ void ConfigManager::ProcessSetCommand(String sentence)
 
 	if (Contains(sentence,"UNS"))
 	{
-		byte lastVolume= snd.Volume;
+		lastVolume= snd.Volume;
 		snd.Volume = data.AlarmsVolume;
 		snd.PlayLKSound(GetValue(sentence));
 		snd.Volume = lastVolume;
@@ -239,7 +232,7 @@ int ConfigManager::GetValue(String s)
 	return s.substring(i+1,ii).toInt();
 }
 
-
+#ifdef PRINTCONFIG
 void ConfigManager::Print(Stream &icf)
 {
 	icf.print("schema:");
@@ -283,4 +276,4 @@ void ConfigManager::Print(Stream &icf)
 	icf.println(data.SpeedCalibrationB);
 }
 
-
+#endif

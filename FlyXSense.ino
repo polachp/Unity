@@ -29,29 +29,29 @@
 #include "FXS_CompensatedVario.h"
 
 float actualPressure;
-Button button;
-SoftwareSerial softSerial(7, 8); // RX, TX
-String gpsData = "";
-String koboData = "";
+static Button button;
+static SoftwareSerial softSerial(7, 8); // RX, TX
+static String gpsData = "";
+static String koboData = "";
 Sounds snd;
 ConfigManager config;
 MS5611 baro(I2C_MS5611_Add);
-bool initialized = false; //delayed initialization of GSPS com port to let the softserial time to load configuration after device start
+static bool initialized = false; //delayed initialization of GSPS com port to let the softserial time to load configuration after device start
 
 #ifdef AIRSPEED // differential pressure
 MS4525  airspd(I2C_4525_Add);
-FXS_CompensatedVario dteVario;
+static FXS_CompensatedVario dteVario;
 #endif
 
 #ifdef DEBUG_SOUND
 int vario = 0;
 #endif
 //loop timers
-unsigned long lastVarioDataTime = 5000;
+static unsigned long lastVarioDataTime = 5000;
 #ifdef DEBUGOUTDATATOSERIAL
 unsigned long lastOutupDataTime = 2000;
 #endif
-unsigned long nextGpsOutputTimeMillis = 5000;
+
 void setup()
 {
 	softSerial.begin(19200);
@@ -95,6 +95,7 @@ void setup()
 }
 
 void loop() {
+
 	if (!initialized && millis() > SERIAL_COMM_DELAY)
 	{
 		softSerial.end();
@@ -108,8 +109,9 @@ void loop() {
 		SetupGps();
 		Serial.begin(SERIAL_SPEED);
 		initialized = true;
-		config.Print(Serial);
+		//config.Print(Serial);
 	}
+
 	ProcessKobo();
 
 	if (initialized)
@@ -129,10 +131,9 @@ void loop() {
 		}
 #else
 		snd.VarioSound(baro.varioData.climbRate);
-#endif
+#endif // airspeed
 
-
-#endif
+#endif // debug sound
 
 		readSensors(); //Executive part that reads all sensor values and process them  
 
@@ -144,6 +145,7 @@ void loop() {
 			SendVarioData();
 			lastVarioDataTime = millis();
 		}
+
 #ifdef DEBUGOUTDATATOSERIAL
 		if ((millis() - lastOutupDataTime) > 100)
 		{
@@ -151,7 +153,6 @@ void loop() {
 			lastOutupDataTime = millis();
 		}
 #endif
-
 	}
 	button.CheckBP();
 }// LOOP
@@ -379,14 +380,9 @@ void VLongPress(int pin)
 {
 #ifdef AIRSPEED
 	//airspeeed sensor for proper null airspeed
-	snd.Play(300, 200);
-	delay(400);
-	snd.Play(300, 200);
-	delay(400);
-	snd.Play(500, 1000);
-	delay(400);
+	snd.Play(500, 2000);
+	delay(1800);
 	airspd.airSpeedData.airspeedReset = true;
-	delay(200);
 	noToneAC();
 #endif
 }

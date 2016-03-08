@@ -1,7 +1,7 @@
 #ifndef DEFAULTVALUES_h
 #define DEFAULTVALUES_h
 
-#define SCHEMAVERSION 2016
+#define SCHEMAVERSION 20160308
 
 //Hardcoded defaults
 #define SENSITIVITY_MIN 50  // mapped 30-100!!
