@@ -32,10 +32,6 @@ extern Sounds snd;
 extern MS4525  airspd;
 #endif
 
-//VARIOMODE
-static const byte normal=0;
-static const byte compensated=1;
-
 class ConfigManager 
 {
 public:

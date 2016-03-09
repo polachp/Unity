@@ -24,6 +24,7 @@ public:
 	float smoothingDteMin;
 	bool compensatedClimbRateAvailable;
 	int32_t compensatedClimbRate;
+	int32_t compensatedClimbRateSM;
 	FXS_CompensatedVario();
 	void CalculateDte();
 };

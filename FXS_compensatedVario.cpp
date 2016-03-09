@@ -2,6 +2,7 @@
 #include "FXS_config.h"
 
 extern ConfigManager config;
+extern int32_t Smooth(int32_t data, float filterVal, float smoothedVal);
 
 FXS_CompensatedVario::FXS_CompensatedVario()
 {
@@ -32,6 +33,7 @@ void FXS_CompensatedVario::CalculateDte()
 	}
 	smoothCompensatedClimbRate += expoSmoothDte_auto * (rawCompensatedClimbRate - smoothCompensatedClimbRate) * 0.001;
 	compensatedClimbRate = smoothCompensatedClimbRate;
+	compensatedClimbRateSM = Smooth(smoothCompensatedClimbRate,0.95,compensatedClimbRateSM); 
 
 	compensatedClimbRateAvailable = true; // allows SPORT protocol to transmit the value every 20 ms
 	baro.varioData.altitudeAt20MsecAvailable = false; // avoid to handel it each time.

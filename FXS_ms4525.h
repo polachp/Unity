@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 #include "FXS_I2C.h"
-#include "FXS_KalmanFilter.h"
 
 
 struct AIRSPEEDDATA {
@@ -37,7 +36,7 @@ class MS4525 {
 	float calib_B;
   private:
 	
-    KalmanFilter   kalmanAirspeedSM;
+   // KalmanFilter   kalmanAirspeedSM;
     void SendCommand(byte command);
     uint8_t _addr;
     uint8_t I2CErrorCode4525 ;

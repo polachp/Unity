@@ -5,14 +5,14 @@
 	        all non-arduino files created by visual micro and all visual studio project or solution files can be freely deleted and are not required to compile a sketch (do not delete your own code!).
 	        note: debugger breakpoints are stored in '.sln' or '.asln' files, knowledge of last uploaded breakpoints is stored in the upload.vmps.xml file. Both files are required to continue a previous debug session without needing to compile and upload again
 	
-	Hardware: Arduino Pro or Pro Mini w/ ATmega328 (5V, 16 MHz), Platform=avr, Package=arduino
+	Hardware: Arduino Pro or Pro Mini w/ ATmega328 (3.3V, 8 MHz), Platform=avr, Package=arduino
 */
 
 #ifndef _VSARDUINO_H_
 #define _VSARDUINO_H_
 #define __AVR_ATmega328p__
 #define __AVR_ATmega328P__
-#define F_CPU 16000000L
+#define F_CPU 8000000L
 #define ARDUINO 10607
 #define ARDUINO_AVR_PRO
 #define ARDUINO_ARCH_AVR
@@ -71,8 +71,6 @@ extern "C" void __cxa_pure_virtual() {;}
 #include <..\_Project\FXS_EEPROMAnything.h>
 #include <..\_Project\FXS_I2C.cpp>
 #include <..\_Project\FXS_I2C.h>
-#include <..\_Project\FXS_KalmanFilter.cpp>
-#include <..\_Project\FXS_KalmanFilter.h>
 #include <..\_Project\FXS_Sounds.cpp>
 #include <..\_Project\FXS_compensatedVario.cpp>
 #include <..\_Project\FXS_config.cpp>
@@ -83,4 +81,5 @@ extern "C" void __cxa_pure_virtual() {;}
 #include <..\_Project\FXS_ms5611.h>
 #include <..\_Project\FXS_sounds.h>
 #include <..\_Project\FXS_toneAC.cpp>
+#include <..\_Project\FXS_toneAC.h>
 #endif

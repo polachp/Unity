@@ -4,17 +4,23 @@ extern ConfigManager config;
 
 Sounds::Sounds()
 {
+	X = 400;
 	SoundOn = true;
 	Volume = 10;
 	BaseFreq = DEFAULTSOUNDBASEFREQ;
-	continous = false;
 }
 
 void Sounds::SetSound(boolean enabled) {
 	SoundOn = enabled;
-	if (enabled) SoundUp();
-	else
-		SoundDn();
+	if (enabled) {
+		PlayBeeps(1000,150,2,100);
+	}
+	else{
+
+		Play(450,350);
+		delay(350);
+		Play(180,500); 
+	}
 }
 
 //////////////////////////////////////
@@ -49,7 +55,6 @@ void Sounds::VarioSound(int32_t climbRate) {
 
 	if (millis() < endBeep  && climbRate >= config.data.LiftTreshold)
 	{
-
 		if (climbRate < 100 && i < 250)
 		{
 			i++;

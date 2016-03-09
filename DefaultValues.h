@@ -1,7 +1,7 @@
 #ifndef DEFAULTVALUES_h
 #define DEFAULTVALUES_h
 
-#define SCHEMAVERSION 20160308
+#define SCHEMAVERSION 5
 
 //Hardcoded defaults
 #define SENSITIVITY_MIN 50  // mapped 30-100!!
@@ -25,13 +25,6 @@
 #define DEFAULTLOWSOUNDBASEFREQ 500 // base sound frequency for low sound mode
 #define DEFAULT_SOUND_RATE_MULTIPLIER 100 // sound beep speed coeff (use 0.5-1.5)
 #define FREQ_RAISE 600 //frequency raises from basefreq up to basefreq + FREQ_RAISE on vario value 0-8
-#define T1 150
-#define MAX 500
-#define X 400
-#define T2 40
-#define MID 120
-#define T3 10
-#define MIN 50
 
 #define VARIODATASENDINTERVAL 500
 

@@ -5,6 +5,8 @@
 #define FILTERING4525_ADC_MIN_AT       10 // when abs(delta between ADC and current value) is less than MIN_AT , apply MIN  
 #define FILTERING4525_ADC_MAX_AT       100 // when abs(delta between ADC and current value) is more than MAX_AT , apply MAX (interpolation in between)
 
+extern int32_t Smooth(int32_t data, float filterVal, float smoothedVal);
+
 MS4525::MS4525(uint8_t addr)
 { // constructor
 	_addr = addr;
@@ -13,16 +15,12 @@ MS4525::MS4525(uint8_t addr)
 
 // **************** Setup the 4525DO sensor *********************
 void MS4525::setup() {
-	//airSpeedData.available=false;
-	kalmanAirspeedSM = KalmanFilter(0.0008f,0.004f);
 	calibrated4525 = false ;
-	//  calibrateCount4525 = 0 ;
 	airSpeedData.airSpeedAvailable = false ;
 	airSpeedData.compensationAvailable = false ;
-
 	airSpeedData.airspeedReset = true ; // set on true to force a reset the first time the 100 ms part is entered
+	
 	nextAirSpeedMillis  =  3200 ;  // save when AirSpeed has to be calculated; Airspeed is available only after 3200 in order to get a stable value (less temperature drift)
-
 	I2c.begin() ;
 	I2c.timeOut( 80); //initialise the time out in order to avoid infinite loop
 	// read the sensor to get the initial temperature
@@ -39,6 +37,7 @@ void MS4525::setup() {
 		airSpeedData.temperature4525 = 300 ;
 	}
 }  //end of setup
+
 void MS4525::setCalibration(int a,int b)
 {
 	calib_A = a/100.0f;
@@ -103,7 +102,7 @@ void MS4525::readSensor() {
 	if (airSpeedMillis > nextAirSpeedMillis) { // publish airspeed only once every xx ms
 		nextAirSpeedMillis = airSpeedMillis + 100 ;
 		if ( smoothAirSpeed >  300) {  // normally send only if positive and greater than 300 cm/sec , otherwise send 0 but for test we keep all values to check for drift
-			airSpeedData.airSpeedSM = (kalmanAirspeedSM.update(smoothAirSpeed)*calib_A ) + calib_B; /// cm/sec
+			airSpeedData.airSpeedSM = Smooth(smoothAirSpeed,0.8,airSpeedData.airSpeedSM);   //(kalmanAirspeedSM.update(smoothAirSpeed)*calib_A ) + calib_B; /// cm/sec
 			airSpeedData.airSpeed = smoothAirSpeed;
 		} else {
 			airSpeedData.airSpeedSM = 0;

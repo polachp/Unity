@@ -24,9 +24,6 @@
     <ClCompile Include="FXS_I2C.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FXS_KalmanFilter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FXS_Sounds.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -39,10 +36,10 @@
     <ClCompile Include="FXS_ms5611.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FXS_toneAC.cpp">
+    <ClCompile Include="FXS_config.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FXS_config.cpp">
+    <ClCompile Include="FXS_toneAC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,9 +56,6 @@
     <ClInclude Include="FXS_I2C.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FXS_KalmanFilter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FXS_config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -74,13 +68,13 @@
     <ClInclude Include="FXS_sounds.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FXS_toneAC.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DefaultValues.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Visual Micro\._PROJECT.vsarduino.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FXS_toneAC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="__vm\._Project.vsarduino.h">

@@ -11,10 +11,10 @@ ConfigManager::ConfigManager()
 void ConfigManager::Load()
 {
 	EEPROM_readAnything(0, data);
-	if (data.SchemaVersion != SCHEMAVERSION )
+	/*if (data.SchemaVersion != SCHEMAVERSION )
 	{
 		SetDefaults();
-	}
+	}*/
 }
 void ConfigManager::Save()
 {
@@ -23,14 +23,18 @@ void ConfigManager::Save()
 
 void ConfigManager::SetVarioMode(byte m)
 {
-	if (m == normal) 
+	data.VarioMode = m;
+	if (m == 0) 
 	{
-		data.VarioMode = normal;
-		snd.SoundUp();
+#ifndef AIRSPEED
+		snd.X = 400;
+#endif
+		snd.PlayBeeps(600,80,4,10);
 	}else{
-		data.VarioMode = compensated;
-		snd.SoundUp2();
-		snd.SoundUp2();
+#ifndef AIRSPEED
+		snd.X = 800;
+#endif
+		snd.PlayBeeps(500,180,3,40);
 	}
 	Save();
 }
@@ -49,19 +53,14 @@ void ConfigManager::LoadConfigToRuntime()
 	if (snd.Volume<10) snd.BaseFreq = data.LowBaseFreq; // in case of lower sount than max we use lower base freq mode
 #ifdef AIRSPEED
 	airspd.setCalibration(data.SpeedCalibrationA,data.SpeedCalibrationB);  
-	SetVarioMode(data.VarioMode);
 #endif
-#ifdef ALLOWMODESWITCH
 	SetVarioMode(data.VarioMode);
-#else
-	SetVarioMode(normal);
-#endif
 }
 
 void ConfigManager::SetDefaults()
 {
 	data.SchemaVersion = SCHEMAVERSION;
-	data.VarioMode = normal;
+	data.VarioMode = 0;
 	data.SoundOn = true;
 	data.BaseFreq = DEFAULTSOUNDBASEFREQ;
 	data.LowBaseFreq = DEFAULTLOWSOUNDBASEFREQ;
@@ -85,7 +84,7 @@ void ConfigManager::ProcessSetCommand(String sentence)
 	{
 		Save();
 		snd.Sonar(3);
-	    return;
+		return;
 	}
 
 	if (Contains(sentence,"UNRESET"))
@@ -165,7 +164,7 @@ void ConfigManager::ProcessSetCommand(String sentence)
 
 	if (Contains(sentence,"UNSLP"))
 	{
-	    SleepMode();
+		SleepMode();
 		return;
 	}
 
@@ -188,7 +187,7 @@ void ConfigManager::ProcessSetCommand(String sentence)
 #endif
 		return;
 	}
-	
+
 	byte lastVolume;
 	if (Contains(sentence, "UNSB")) //"$UNSB,1600,500,3,50*"  tone, ms,repeats, pause
 	{
@@ -197,10 +196,10 @@ void ConfigManager::ProcessSetCommand(String sentence)
 		int a = sentence.indexOf(",");
 		int aa = sentence.indexOf(",", a + 1);
 		int tone = sentence.substring(a + 1, aa).toInt();
-	
+
 		a = sentence.indexOf(",", aa + 1);
 		int ms = sentence.substring(aa + 1, a).toInt();
-		
+
 		aa = sentence.indexOf(",", a + 1);
 		int rep = sentence.substring(a + 1, aa).toInt();
 
@@ -222,7 +221,7 @@ void ConfigManager::ProcessSetCommand(String sentence)
 		return;
 	}
 
-	
+
 }
 
 int ConfigManager::GetValue(String s)
@@ -232,48 +231,4 @@ int ConfigManager::GetValue(String s)
 	return s.substring(i+1,ii).toInt();
 }
 
-#ifdef PRINTCONFIG
-void ConfigManager::Print(Stream &icf)
-{
-	icf.print("schema:");
-	icf.println(data.SchemaVersion);
 
-	icf.print("mode:");
-	icf.println(data.VarioMode);
-
-	icf.print("soundon:");
-	icf.println(data.SoundOn);
-
-	icf.print("basefreq:");
-	icf.println(data.BaseFreq);
-
-	icf.print("lowbasefreq:");
-	icf.println(data.LowBaseFreq);
-
-	icf.print("LowSoundVolume:");
-	icf.println(data.LowSoundVolume);
-
-	icf.print("Volume:");
-	icf.println(data.Volume);
-
-	icf.print("LiftTreshold:");
-	icf.println(data.LiftTreshold);
-
-	icf.print("SinkTreshold:");
-	icf.println(data.SinkTreshold);
-
-	icf.print("Beeprate:");
-	icf.println(data.RateMultiplier);
-
-	icf.print("Sensitivity:");
-	icf.println(data.Sensitivity);
-
-	icf.print("Compensation:");
-	icf.println(data.Compesation);
-	icf.print("SpeedCalibrationA:");
-	icf.println(data.SpeedCalibrationA);
-	icf.print("SpeedCalibrationB:");
-	icf.println(data.SpeedCalibrationB);
-}
-
-#endif

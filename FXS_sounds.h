@@ -18,8 +18,25 @@ private:
 	unsigned long  cadence;
 	void SlideSound(int start,int high,int raiseStep,int delayTime);
 
+	const byte T1 = 150;
+	const int MAX = 500;
+	
+	const byte T2 = 40;
+	const byte MID = 120;
+	const byte T3 = 10;
+	const byte MIN = 50;
+	
+	//#define T1 150
+	//#define MAX 500
+	//#define X 400
+	//#define T2 40
+	//#define MID 120
+	//#define T3 10
+	//#define MIN 50
+
 public:
-	boolean continous;
+	int X;
+	
 	Sounds();
 	boolean SoundOn;
 	int BaseFreq;
@@ -37,7 +54,7 @@ public:
 	void Alarm(byte rings);
 	void Click(int tone);
 	void Sonar(int tone);
-	
+
 	void PlayLKSound(int soundCode);
 	void PlayBeeps(int note, int ms, int repeats, int pause);
 };

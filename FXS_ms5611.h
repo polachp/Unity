@@ -3,7 +3,6 @@
 
 #include "DefaultValues.h"
 #include "FXS_I2C.h"
-#include "FXS_KalmanFilter.h"
 
 struct VARIODATA {
   int32_t temperature;     // in 1/100 Celsius
@@ -17,7 +16,6 @@ struct VARIODATA {
 
   int32_t climbRate;       // in cm /sec = vertical speed
   int32_t climbRateSM;
-  int32_t climbRates[6];
   bool climbRateAvailable ;
   bool switchClimbRateAvailable ; // use to say to the readsensors loop that that a climbrate is available (to select the one being send)
 
@@ -30,14 +28,13 @@ struct VARIODATA {
 class MS5611 {
   public:
     MS5611(uint8_t addr);
-   
     VARIODATA varioData ;
     void setup();
     void readSensor();
     void resetValues();
 
   private:
-    KalmanFilter  kalmanVario;
+   // KalmanFilter  kalmanVario;
     long result ;
     uint8_t _addr;
     unsigned int _calibrationData[7]; // The factory calibration data of the ms5611
