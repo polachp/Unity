@@ -16,7 +16,6 @@ void Sounds::SetSound(boolean enabled) {
 		PlayBeeps(1000,150,2,100);
 	}
 	else{
-
 		Play(450,350);
 		delay(350);
 		Play(180,500); 

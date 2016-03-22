@@ -20,7 +20,6 @@ private:
 
 	const byte T1 = 150;
 	const int MAX = 500;
-	
 	const byte T2 = 40;
 	const byte MID = 120;
 	const byte T3 = 10;

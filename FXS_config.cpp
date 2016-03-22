@@ -11,11 +11,12 @@ ConfigManager::ConfigManager()
 void ConfigManager::Load()
 {
 	EEPROM_readAnything(0, data);
-	/*if (data.SchemaVersion != SCHEMAVERSION )
+	if (data.SchemaVersion != SCHEMAVERSION )
 	{
 		SetDefaults();
-	}*/
+	}
 }
+
 void ConfigManager::Save()
 {
 	EEPROM_writeAnything(0, data);
@@ -29,7 +30,7 @@ void ConfigManager::SetVarioMode(byte m)
 #ifndef AIRSPEED
 		snd.X = 400;
 #endif
-		snd.PlayBeeps(600,80,4,10);
+		snd.PlayBeeps(600,80,4,20);
 	}else{
 #ifndef AIRSPEED
 		snd.X = 800;
@@ -41,7 +42,7 @@ void ConfigManager::SetVarioMode(byte m)
 
 int MapSensitivity(int sen)
 {
-	return map(sen, 0, 100, 30, 120);
+	return map(sen, 0, 100, 10, 120);
 }
 
 void ConfigManager::LoadConfigToRuntime()

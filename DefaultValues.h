@@ -4,15 +4,15 @@
 #define SCHEMAVERSION 5
 
 //Hardcoded defaults
-#define SENSITIVITY_MIN 50  // mapped 30-100!!
+#define SENSITIVITY_MIN 35  // mapped 30-100!!
 
-#define SMOOTHING_DTE_MIN 50 // non mapped
+#define SMOOTHING_DTE_MIN 35 // non mapped
 #define SMOOTHING_DTE_MAX 150
 #define SMOOTHING_DTE_MIN_AT 100
 #define SMOOTHING_DTE_MAX_AT 1000
 #define COMPENSATION 100
 
-#define DEFAULT_LIFT_TRESHOLD 10
+#define DEFAULT_LIFT_TRESHOLD 15
 #define DEFAULT_SINK_TRESHOLD -250
 
 #define SPEEDCALIBRATION_A 95

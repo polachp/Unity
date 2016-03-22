@@ -4,8 +4,9 @@
 
 #define VARIO
 #define GPS
-#define AIRSPEED
-#define TESTCOMPENSTAION
+//#define HELMET
+//#define AIRSPEED
+//#define TESTCOMPENSTAION
 
 //#define DEBUG
 //#define DEBUG_SOUND
@@ -23,11 +24,16 @@
 #include "FXS_EEPROMAnything.h"
 #include "DefaultValues.h"
 #include "FXS_ms5611.h"
+
+#ifdef AIRSPEED
 #include "FXS_ms4525.h"
+#include "FXS_CompensatedVario.h"
+#endif
+
 #include "FXS_config.h"
 #include "FXS_sounds.h"
 #include "FXS_Button.h"
-#include "FXS_CompensatedVario.h"
+
 
 float actualPressure;
 static Button button;
@@ -62,23 +68,6 @@ void setup()
 	button.OnVLongPress = VLongPress;
 	button.OnDblClick = OnDblClick;
 
-	//reset if holding button
-	int i = 0;
-	while (digitalRead(BUTTONPIN) == LOW)
-	{
-		i++;
-		snd.Play(700, 1000);
-		delay(50 * i);
-		noToneAC();
-		delay(1000 - i * 50);
-		if (i >= 10)
-		{
-			snd.Play(1500, 1000);
-			config.SetDefaults();
-			break;
-		}
-	}
-
 	actualPressure = 101325;
 	baro.setup();
 #ifdef AIRSPEED
@@ -86,16 +75,27 @@ void setup()
 #endif
 
 	config.LoadConfigToRuntime();
+#ifdef HELMET
+	config.SetVarioMode(0);
+	config.data.BaseFreq = 200;
+	config.data.Volume=1;
+	config.data.LiftTreshold = 20;
+	config.data.SinkTreshold  = -1000;
+	baro.varioData.sensitivity = 23;
+
+#endif
 
 #ifdef DEBUG_SOUND
-	config.data.RateMultiplier = 130;
+	config.data.RateMultiplier = 100;
 	snd.SetSound(true);
-	snd.BaseFreq = DEFAULTSOUNDBASEFREQ;
-	snd.Volume = 10;
+	snd.BaseFreq = DEFAULTLOWSOUNDBASEFREQ;
+	snd.Volume = 9;
 #endif
 }
 
 void loop() {
+
+#ifdef GPS
 	if (!initialized && millis() > SERIAL_COMM_DELAY)
 	{
 		softSerial.end();
@@ -108,8 +108,11 @@ void loop() {
 		SetupGps();
 		Serial.begin(SERIAL_SPEED);
 		initialized = true;
-		PrintCFG();
+		//PrintCFG();
 	}
+#else
+	initialized=true;
+#endif
 
 	ProcessKobo();
 
@@ -137,9 +140,12 @@ void loop() {
 		readSensors(); //Executive part that reads all sensor values and process them  
 
 #ifndef DEBUG_COMMANDS
+#ifdef GPS
 		ProcessGPS();
 #endif
+#endif
 
+#ifndef HELMET
 #ifdef DEBUGOUTDATATOSERIAL
 		if ((millis() - lastOutupDataTime) > 100)
 		{
@@ -152,6 +158,7 @@ void loop() {
 			SendVarioData();
 			lastVarioDataTime = millis();
 		}
+#endif
 #endif
 	}
 	button.CheckBP();
@@ -171,7 +178,6 @@ void loop() {
 ////
 //// e.g.:
 //// $LXWP0,Y,222.3,1665.5,1.71,,,,,,239,174,10.1
-;
 void SendVarioData()
 {
 #ifndef DEBUGOUTDATATOSERIAL
@@ -217,10 +223,22 @@ void SetupGps(){
 
 	String cmd = "";
 
-	cmd = "PMTK314,0,1,0,1,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0"; //without speed sentences
+	cmd = "PMTK314,0,1,0,1,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0"; //without speed sentences
+	send_cmd(softSerial, cmd);
+	
+	cmd = "PMTK225,0"; // power mode
+	send_cmd(softSerial, cmd);
+	
+	cmd = "PMTK313,1"; // SBAS ON
 	send_cmd(softSerial, cmd);
 
-	cmd = "PMTK220,500";
+	cmd = "PMTK301,2"; //WAAS ENABLED
+	send_cmd(softSerial, cmd);
+
+	cmd = "PMTK397,0";  // Turn off Navthreshold
+	send_cmd(softSerial, cmd);
+
+	cmd = "PMTK220,330";
 	send_cmd(softSerial, cmd);
 }
 
@@ -431,48 +449,46 @@ void DebugOutputToSerial()
 	//Serial.print( baro.varioData.temperature/100.0);
 }
 #endif // OutputToSerial
-
-
-
-void PrintCFG()
-{
-	Serial.print("schema:");
-	Serial.println(config.data.SchemaVersion);
-
-	Serial.print("mode:");
-	Serial.println(config.data.VarioMode);
-
-	Serial.print("soundon:");
-	Serial.println(config.data.SoundOn);
-
-	Serial.print("basefreq:");
-	Serial.println(config.data.BaseFreq);
-
-	Serial.print("lowbasefreq:");
-	Serial.println(config.data.LowBaseFreq);
-
-	Serial.print("LowSoundVolume:");
-	Serial.println(config.data.LowSoundVolume);
-
-	Serial.print("Volume:");
-	Serial.println(config.data.Volume);
-
-	Serial.print("LiftTreshold:");
-	Serial.println(config.data.LiftTreshold);
-
-	Serial.print("SinkTreshold:");
-	Serial.println(config.data.SinkTreshold);
-
-	Serial.print("Beeprate:");
-	Serial.println(config.data.RateMultiplier);
-
-	Serial.print("Sensitivity:");
-	Serial.println(config.data.Sensitivity);
-
-	Serial.print("Compensation:");
-	Serial.println(config.data.Compesation);
-	Serial.print("SpeedCalibrationA:");
-	Serial.println(config.data.SpeedCalibrationA);
-	Serial.print("SpeedCalibrationB:");
-	Serial.println(config.data.SpeedCalibrationB);
-}
+//
+//void PrintCFG()
+//{
+//	Serial.print("schema:");
+//	Serial.println(config.data.SchemaVersion);
+//
+//	Serial.print("mode:");
+//	Serial.println(config.data.VarioMode);
+//
+//	Serial.print("soundon:");
+//	Serial.println(config.data.SoundOn);
+//
+//	Serial.print("basefreq:");
+//	Serial.println(config.data.BaseFreq);
+//
+//	Serial.print("lowbasefreq:");
+//	Serial.println(config.data.LowBaseFreq);
+//
+//	Serial.print("LowSoundVolume:");
+//	Serial.println(config.data.LowSoundVolume);
+//
+//	Serial.print("Volume:");
+//	Serial.println(config.data.Volume);
+//
+//	Serial.print("LiftTreshold:");
+//	Serial.println(config.data.LiftTreshold);
+//
+//	Serial.print("SinkTreshold:");
+//	Serial.println(config.data.SinkTreshold);
+//
+//	Serial.print("Beeprate:");
+//	Serial.println(config.data.RateMultiplier);
+//
+//	Serial.print("Sensitivity:");
+//	Serial.println(config.data.Sensitivity);
+//
+//	Serial.print("Compensation:");
+//	Serial.println(config.data.Compesation);
+//	Serial.print("SpeedCalibrationA:");
+//	Serial.println(config.data.SpeedCalibrationA);
+//	Serial.print("SpeedCalibrationB:");
+//	Serial.println(config.data.SpeedCalibrationB);
+//}

@@ -9,7 +9,7 @@
  //this version must be changed when configuration structure changes! (causes reset of params while loading them)
 struct Configuration
 {
-	int SchemaVersion;
+	byte SchemaVersion;
 	byte VarioMode;
 	int LiftTreshold;
 	int SinkTreshold;
@@ -42,15 +42,13 @@ public:
 	void ProcessSetCommand(String cmd);
 	void SetVarioMode(byte m);
 	void Save();
-#ifdef PRINTCONFIG
-	void Print(Stream &icf);
-#endif
+
+	//void Print(Stream &icf);
+
 private:
 	void Load();
     int GetValue(String s);
 };
-
-//#include "HardwareSerial.h"
 #endif 
 
 
