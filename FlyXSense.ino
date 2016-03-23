@@ -24,6 +24,7 @@
 #include "FXS_EEPROMAnything.h"
 #include "DefaultValues.h"
 #include "FXS_ms5611.h"
+#include "LowPower.h"
 
 #ifdef AIRSPEED
 #include "FXS_ms4525.h"
@@ -44,6 +45,7 @@ Sounds snd;
 ConfigManager config;
 MS5611 baro(I2C_MS5611_Add);
 static bool initialized = false; //delayed initialization of GSPS com port to let the softserial time to load configuration after device start
+static String cmd = "";
 
 #ifdef AIRSPEED // differential pressure
 MS4525  airspd(I2C_4525_Add);
@@ -103,7 +105,7 @@ void loop() {
 		String cmd = "";
 		cmd = "PMTK251,19200";
 		send_cmd(softSerial, cmd);
-
+		softSerial.end();
 		softSerial.begin(SERIAL_SPEED);
 		SetupGps();
 		Serial.begin(SERIAL_SPEED);
@@ -207,7 +209,7 @@ void SendVarioData()
 }
 
 void send_cmd(Stream &icf, String &cmd) {
-	unsigned int checksum_end, ai, bi;                                               // Calculating checksum for data string
+	static unsigned int checksum_end, ai, bi;                                               // Calculating checksum for data string
 	for (checksum_end = 0, ai = 0; ai < cmd.length(); ai++)
 	{
 		bi = (unsigned char)cmd[ai];
@@ -225,10 +227,10 @@ void SetupGps(){
 
 	cmd = "PMTK314,0,1,0,1,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0"; //without speed sentences
 	send_cmd(softSerial, cmd);
-	
+
 	cmd = "PMTK225,0"; // power mode
 	send_cmd(softSerial, cmd);
-	
+
 	cmd = "PMTK313,1"; // SBAS ON
 	send_cmd(softSerial, cmd);
 
@@ -238,33 +240,25 @@ void SetupGps(){
 	cmd = "PMTK397,0";  // Turn off Navthreshold
 	send_cmd(softSerial, cmd);
 
-	cmd = "PMTK220,330";
+	cmd = "PMTK220,500";
 	send_cmd(softSerial, cmd);
 }
 
-void SleepMode(){
-	//String cmd = "";
-	//cmd = "PMTK161,0";
-	//send_cmd(softSerial, cmd);
+void wakeUp()
+{//nothing its just for func pointer in sleep	
+}
 
-	//for (int x = 1; x < 20; x++){
-	//	pinMode(x, INPUT);
-	//	digitalWrite(x, LOW);
-	//}
-	//digitalWrite(13, LOW);
-	//byte adcsra, mcucr1, mcucr2;
-	//sleep_enable();
-	//set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-	//adcsra = ADCSRA;               //save the ADC Control and Status Register A
-	//ADCSRA = 0;                    //disable ADC
-	//cli();
-	//EIMSK |= _BV(INT0);            //enable INT0
-	//mcucr1 = MCUCR | _BV(BODS) | _BV(BODSE);  //turn off the brown-out detector
-	//mcucr2 = mcucr1 & ~_BV(BODSE);
-	//MCUCR = mcucr1;
-	//MCUCR = mcucr2;
-	//sei();                         //ensure interrupts enabled so we can wake up again
-	//sleep_cpu();                   //go to sleep
+void SleepMode(){
+	cmd = "PMTK161,0";
+	send_cmd(softSerial, cmd);
+	snd.PlayBeeps(80,700,1,0);
+	delay(1000);
+	attachInterrupt(0,wakeUp, LOW);
+	LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF); 
+	detachInterrupt(0); 
+	cmd = "wake";
+	send_cmd(softSerial, cmd);
+	config.SetVarioMode(config.data.VarioMode);
 }
 
 void ProcessGPS()
@@ -401,11 +395,15 @@ void VLongPress(int pin)
 #endif
 
 #ifdef AIRSPEED
+	SleepMode();
 	//airspeeed sensor for proper null airspeed
-	snd.Play(500, 2000);
-	delay(1800);
+	/*snd.Play(500, 2000);
+	delay(1800);*/
 	airspd.airSpeedData.airspeedReset = true;
-	noToneAC();
+	return;
+#else
+	SleepMode(); 
+	return;
 #endif
 }
 

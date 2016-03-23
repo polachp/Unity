@@ -7,7 +7,7 @@ Button:: Button()
   Debounce = 20;
   DblClickDelay = 250;
   LongPressDelay = 1000;
-  VLongPressDelay = 4000;
+  VLongPressDelay = 6000;
  
   // Initialization of variables
   _state = true;
