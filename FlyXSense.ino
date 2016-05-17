@@ -5,7 +5,7 @@
 #define VARIO
 #define GPS
 //#define HELMET
-//#define AIRSPEED
+#define AIRSPEED
 //#define TESTCOMPENSTAION
 
 //#define DEBUG
@@ -69,8 +69,8 @@ void setup()
 	button.OnLongPress = OnLongClick;
 	button.OnVLongPress = VLongPress;
 	button.OnDblClick = OnDblClick;
-
 	actualPressure = 101325;
+
 	baro.setup();
 #ifdef AIRSPEED
 	airspd.setup();
@@ -100,16 +100,16 @@ void loop() {
 #ifdef GPS
 	if (!initialized && millis() > SERIAL_COMM_DELAY)
 	{
-		softSerial.end();
-		softSerial.begin(9600);
-		String cmd = "";
+		/*softSerial.begin(9600);*/
+		/*String cmd = "";
 		cmd = "PMTK251,19200";
-		send_cmd(softSerial, cmd);
+		send_cmd(softSerial, cmd);*/
 		softSerial.end();
 		softSerial.begin(SERIAL_SPEED);
 		SetupGps();
 		Serial.begin(SERIAL_SPEED);
 		initialized = true;
+		airspd.airSpeedData.airspeedReset = true;
 		//PrintCFG();
 	}
 #else
@@ -231,11 +231,11 @@ void SetupGps(){
 	cmd = "PMTK225,0"; // power mode
 	send_cmd(softSerial, cmd);
 
-	cmd = "PMTK313,1"; // SBAS ON
-	send_cmd(softSerial, cmd);
+	//cmd = "PMTK313,1"; // SBAS ON
+	//send_cmd(softSerial, cmd);
 
-	cmd = "PMTK301,2"; //WAAS ENABLED
-	send_cmd(softSerial, cmd);
+	//cmd = "PMTK301,2"; //WAAS ENABLED
+	//send_cmd(softSerial, cmd);
 
 	cmd = "PMTK397,0";  // Turn off Navthreshold
 	send_cmd(softSerial, cmd);
@@ -351,8 +351,6 @@ void OnClick(int pin)
 	if (!snd.SoundOn)
 	{
 		snd.SetSound(true);
-		config.data.SoundOn = true;
-		config.Save();
 		return;
 	}
 
@@ -360,12 +358,12 @@ void OnClick(int pin)
 	{
 		snd.Volume = config.data.LowSoundVolume;
 		snd.BaseFreq = config.data.LowBaseFreq;
-		snd.SoundDn2();
+		snd.PlayBeeps( config.data.LowBaseFreq,160,2,20);
 	}
 	else{
 		snd.Volume = 10;
 		snd.BaseFreq = config.data.BaseFreq;
-		snd.SoundUp2();
+		snd.PlayBeeps( config.data.BaseFreq,160,2,20);
 	}
 
 	config.data.Volume = snd.Volume;
@@ -395,10 +393,9 @@ void VLongPress(int pin)
 #endif
 
 #ifdef AIRSPEED
-	SleepMode();
 	//airspeeed sensor for proper null airspeed
-	/*snd.Play(500, 2000);
-	delay(1800);*/
+	snd.SoundUp();
+	snd.SoundDn();
 	airspd.airSpeedData.airspeedReset = true;
 	return;
 #else

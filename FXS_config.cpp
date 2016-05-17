@@ -30,12 +30,12 @@ void ConfigManager::SetVarioMode(byte m)
 #ifndef AIRSPEED
 		snd.X = 400;
 #endif
-		snd.PlayBeeps(600,80,4,20);
+		snd.PlayBeeps(500,80,3,10);
 	}else{
 #ifndef AIRSPEED
-		snd.X = 800;
+		snd.X = 1000;
 #endif
-		snd.PlayBeeps(500,180,3,40);
+		snd.PlayBeeps(400,160,3,10);
 	}
 	Save();
 }
@@ -49,7 +49,7 @@ void ConfigManager::LoadConfigToRuntime()
 {
 	Load();
 	baro.varioData.sensitivity = MapSensitivity(data.Sensitivity);
-	snd.SoundOn = data.SoundOn;
+	snd.SoundOn = true;
 	snd.Volume = data.Volume;
 	if (snd.Volume<10) snd.BaseFreq = data.LowBaseFreq; // in case of lower sount than max we use lower base freq mode
 #ifdef AIRSPEED
@@ -112,7 +112,7 @@ void ConfigManager::ProcessSetCommand(String sentence)
 	if (Contains(sentence,"UNBF"))
 	{
 		value = GetValue(sentence);
-		value = constrain(value,350,3000);
+		value = constrain(value,300,3000);
 		data.BaseFreq=value;
 		snd.BaseFreq=value;
 		return;
@@ -128,7 +128,7 @@ void ConfigManager::ProcessSetCommand(String sentence)
 
 	if (Contains(sentence,"UNLBF"))
 	{
-		value = constrain(GetValue(sentence), 350, 3000);
+		value = constrain(GetValue(sentence), 300, 3000);
 		data.LowBaseFreq=value;
 		snd.BaseFreq=value;
 		return;

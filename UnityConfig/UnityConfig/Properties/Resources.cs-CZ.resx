@@ -208,7 +208,7 @@
     <value>Obnovit informace o zařízení</value>
   </data>
   <data name="Menu_Tool_Setting_Title" xml:space="preserve">
-    <value>Nastavení</value>
+    <value>Jazyk</value>
   </data>
   <data name="Menu_Tool_Title" xml:space="preserve">
     <value>Nástroje</value>
@@ -217,16 +217,19 @@
     <value>Zařízení</value>
   </data>
   <data name="Menu_Unity_ReadConfig_Title" xml:space="preserve">
-    <value>Read config</value>
+    <value>Načíst konfiguraci</value>
   </data>
   <data name="Menu_Unity_Title" xml:space="preserve">
     <value>Unity</value>
   </data>
   <data name="Menu_Unity_WriteConfig_Title" xml:space="preserve">
-    <value>Write config</value>
+    <value>Uložit konfiguraci</value>
   </data>
   <data name="MessageBox_PleaseRestartApplication" xml:space="preserve">
     <value>Pro uplatnění nastavení restartujte aplikaci.</value>
+  </data>
+  <data name="NotConnected" xml:space="preserve">
+    <value>Zařízení není připojeno</value>
   </data>
   <data name="PROPERTY_AirspeedCompensationAParam_Description" xml:space="preserve">
     <value>Základní lineární kompenzace je implementována pomocí rovnice y =A*x+B. Tato hodnota je parametr A.</value>
@@ -265,7 +268,7 @@
     <value />
   </data>
   <data name="PROPERTY_GROUP_AirspeedCompensation" xml:space="preserve">
-    <value>Kompezace - Rychlost vzduchu</value>
+    <value>Rychlostní sonda - kompenzace</value>
   </data>
   <data name="PROPERTY_GROUP_Sounds" xml:space="preserve">
     <value>Zvuky</value>
@@ -324,7 +327,16 @@
   <data name="PROPERTY_SinkTreshold_ValidationMessage" xml:space="preserve">
     <value />
   </data>
+  <data name="ReadConfig" xml:space="preserve">
+    <value>Provést načtení nastavení z přístroje?</value>
+  </data>
   <data name="Setting_Property_Language" xml:space="preserve">
     <value>Jazyk</value>
+  </data>
+  <data name="SuccessfullySaved" xml:space="preserve">
+    <value>Konfigurace byla uložena do zařízení</value>
+  </data>
+  <data name="WriteConfig" xml:space="preserve">
+    <value>Uložit aktuální nastavení do přístroje?</value>
   </data>
 </root>

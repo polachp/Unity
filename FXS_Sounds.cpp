@@ -12,13 +12,12 @@ Sounds::Sounds()
 
 void Sounds::SetSound(boolean enabled) {
 	SoundOn = enabled;
+	config.data.SoundOn = true;
 	if (enabled) {
-		PlayBeeps(1000,150,2,100);
+		snd.SoundUp2();
 	}
 	else{
-		Play(450,350);
-		delay(350);
-		Play(180,500); 
+		snd.SoundDn2();
 	}
 }
 
@@ -47,7 +46,7 @@ void Sounds::VarioSound(int32_t climbRate) {
 	if (!SoundOn) return;
 	if (climbRate <= config.data.SinkTreshold)
 	{
-		freq = map(climbRate, -800, config.data.SinkTreshold, 60, 220);
+		freq = map(climbRate, -1000, config.data.SinkTreshold, 60, 220);
 		toneAC(freq, Volume, 1000, true);
 		return;
 	}
@@ -61,7 +60,7 @@ void Sounds::VarioSound(int32_t climbRate) {
 				freqShift = freqShift + 1;
 		}
 
-		freq = map(climbRate, config.data.LiftTreshold, 800, BaseFreq, BaseFreq + FREQ_RAISE);
+		freq = map(climbRate, config.data.LiftTreshold, 1000, BaseFreq, BaseFreq + FREQ_RAISE);
 		freq = constrain(freq, 200, BaseFreq + FREQ_RAISE + 100);
 		toneAC(freq + freqShift, Volume, 5000, true);
 	}
@@ -79,7 +78,7 @@ int Sounds::period(int32_t climbRate) {
 	}
 	else
 	{
-		value = map(climbRate, X, 800, (MID + T2)*mod, MIN + T3);
+		value = map(climbRate, X, 1000, (MID + T2)*mod, MIN + T3);
 		if (value < MIN + T3)
 			return MIN + T3;
 		else
@@ -97,7 +96,7 @@ int Sounds::beepDuration(int32_t climbRate) {
 	}
 	else
 	{
-		value = map(climbRate, X, 800, MID*mod, MIN);
+		value = map(climbRate, X, 1000, MID*mod, MIN);
 		if (value < MIN)
 			return MIN;
 		else
@@ -161,8 +160,8 @@ void Sounds::SoundDn() {
 
 void Sounds::Click(int tone)                 //play only once welcome beep after turning on arduino vario
 {
-	toneAC(tone, Volume, 25, true);
-	delay(25);
+	toneAC(tone, Volume, 30, false);
+	toneAC(tone*2, Volume, 30, false);
 	noToneAC();
 }
 
@@ -220,19 +219,19 @@ void Sounds::PlayLKSound(int soundCode){
 	case 0:  SoundUp2(); SoundUp2(); SoundUp2(); delay(1000);
 		break;
 	case 1:
-		Click(200);
+		Click(100);
 		break;
 	case 2:
-		Click(250);
+		Click(120);
 		break;
 	case 3:
-		Click(300);
+		Click(140);
 		break;
 	case 4:
-		Click(400);
+		Click(160);
 		break;
 	case 5:
-		Click(500);
+		Click(180);
 		break;
 	case 6:
 		SoundUp();

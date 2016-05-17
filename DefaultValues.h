@@ -7,7 +7,7 @@
 #define SENSITIVITY_MIN 35  // mapped 30-100!!
 
 #define SMOOTHING_DTE_MIN 35 // non mapped
-#define SMOOTHING_DTE_MAX 150
+#define SMOOTHING_DTE_MAX 80
 #define SMOOTHING_DTE_MIN_AT 100
 #define SMOOTHING_DTE_MAX_AT 1000
 #define COMPENSATION 100
@@ -30,7 +30,7 @@
 
 #define SOUNDPIN1    9
 #define SOUNDPIN2    10
-#define SERIAL_SPEED 19200
+#define SERIAL_SPEED 9600
 #define I2C_MS5611_Add 0x77
 #define I2C_4525_Add   0x28
 #define SOUNDPIN    5

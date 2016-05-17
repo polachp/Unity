@@ -42,6 +42,9 @@
     <ClCompile Include="FXS_toneAC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LowPower.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FXS_Button.h">
@@ -75,6 +78,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FXS_toneAC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LowPower.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="__vm\._Project.vsarduino.h">

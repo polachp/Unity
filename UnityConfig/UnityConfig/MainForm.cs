@@ -24,47 +24,65 @@ namespace UnityConfig
 
         private void RefreshDeviceInformation()
         {
-             this.Device = UnityDeviceManager.TryGetDeviceInformation();
-             unityToolStripMenuItem.Visible = this.Device.IsConnected;
+            this.Device = UnityDeviceManager.TryGetDeviceInformation();
 
-             readConfigToolStripMenuItem.Enabled = this.Device.IsReady && this.Device.ConfigFileExists;
-             writeConfigToolStripMenuItem.Enabled = this.Device.IsReady;             
+            //toolStripMenuItem1.Enabled = this.Device.IsReady && this.Device.ConfigFileExists;
+            //toolStripMenuItem2.Enabled = this.Device.IsReady;
         }
 
+        private void ReadConfig()
+        {
+            var fileName = this.Device.ConfigSkriptFilePath;
+            var error = false;
+            var setting = UnityScriptParser.ParseScriptFromFile(fileName, out error);
+            if (error)
+            {
+                MessageBox.Show(Resources.Import_Error);
+            }
+            else
+            {
+                configurationControl.Setting = setting;
+            }
+        }
         private void SetLanguage()
         {
             //Menus
-            fileToolStripMenuItem.Text = Resources.Menu_File_Title;
-            importScriptToolStripMenuItem.Text = Resources.Menu_File_Import_Title;
-            exportScriptToolStripMenuItem.Text = Resources.Menu_File_Export_Title;
-            generateScriptToolStripMenuItem.Text = Resources.Menu_File_Generate_Title;
-            quitToolStripMenuItem.Text = Resources.Menu_File_Quit_Title;
+            //fileToolStripMenuItem.Text = Resources.Menu_File_Title;
+            //importScriptToolStripMenuItem.Text = Resources.Menu_File_Import_Title;
+            //exportScriptToolStripMenuItem.Text = Resources.Menu_File_Export_Title;
+            //generateScriptToolStripMenuItem.Text = Resources.Menu_File_Generate_Title;
+            //quitToolStripMenuItem.Text = Resources.Menu_File_Quit_Title;
 
-            languagesToolStripMenuItem.Text = Resources.Menu_Languages_Title;
-            englishToolStripMenuItem.Text = Resources.Menu_Languages_English_Title;
-            czechToolStripMenuItem.Text = Resources.Menu_Languages_Czech_Title;
+            //languagesToolStripMenuItem.Text = Resources.Menu_Languages_Title;
+            //englishToolStripMenuItem.Text = Resources.Menu_Languages_English_Title;
+            //czechToolStripMenuItem.Text = Resources.Menu_Languages_Czech_Title;
+            //settingToolStripMenuItem.Text = Resources.Menu_Tool_Setting_Title;
+            //toolsToolStripMenuItem.Text = Resources.Menu_Tool_Title;
 
             helpToolStripMenuItem.Text = Resources.Menu_Help_Title;
             aboutToolStripMenuItem.Text = Resources.Menu_Help_About_Title;
 
-            toolsToolStripMenuItem.Text = Resources.Menu_Tool_Title;
-            settingToolStripMenuItem.Text = Resources.Menu_Tool_Setting_Title;
+            settingToolStripMenuItem1.Text = Resources.Menu_Tool_Setting_Title;
 
-            unityToolStripMenuItem.Text = Resources.Menu_Unity_Title;
-            readConfigToolStripMenuItem.Text= Resources.Menu_Unity_ReadConfig_Title;
-            writeConfigToolStripMenuItem.Text = Resources.Menu_Unity_WriteConfig_Title;
-            deviceToolStripMenuItem.Text = Resources.Menu_Unity_Device_Title;
+            toolStripMenuItem1.Text = Resources.Menu_Unity_ReadConfig_Title;
+            toolStripMenuItem2.Text = Resources.Menu_Unity_WriteConfig_Title;
+            toolStripMenuItem3.Text = Resources.Menu_Unity_Device_Title;
 
-            refreshDeviceToolStripMenuItem.Text = Resources.Menu_Tool_RefreshDevice_Title;            
+            //refreshDeviceToolStripMenuItem.Text = Resources.Menu_Tool_RefreshDevice_Title;            
         }
 
         private void MainForm_Load(object sender, EventArgs e)
-        {            
+        {
             SetLanguage();
             this.RefreshDeviceInformation();
 
-            var setting = UnityConfiguration.UnitySetting.CreateDefault();
-            this.configurationControl.Setting = setting;
+            if (this.Device.IsReady && this.Device.ConfigFileExists) { ReadConfig(); }
+            else
+            {
+              
+                var setting = UnityConfiguration.UnitySetting.CreateDefault();
+                this.configurationControl.Setting = setting;
+            }
         }
 
         private string GenerateScript(UnitySetting setting)
@@ -169,40 +187,60 @@ namespace UnityConfig
             this.RefreshDeviceInformation();
         }
 
-        private void readConfigToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if(MessageBox.Show("Do you really want read setting from Unity?", "Reading setting from Unity...", MessageBoxButtons.OKCancel) == System.Windows.Forms.DialogResult.OK)
-            {
-                var fileName = this.Device.ConfigSkriptFilePath;
-                var error = false;
-                var setting = UnityScriptParser.ParseScriptFromFile(fileName, out error);
-                if (error)
-                {
-                    MessageBox.Show(Resources.Import_Error);
-                }
-                else
-                {
-                    configurationControl.Setting = setting;
-                }
-            }
-        }
-
-        private void writeConfigToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (MessageBox.Show("Do you really want write setting into Unity?", "Writing setting into Unity...", MessageBoxButtons.OKCancel) == System.Windows.Forms.DialogResult.OK)
-            {
-                var fileName = this.Device.ConfigSkriptFilePath;
-                var script = this.GenerateScript(configurationControl.Setting);
-                File.WriteAllText(fileName, script);
-            }
-        }
-
         private void deviceToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (var form = new DeviceInfoForm(this.Device))
             {
                 form.ShowDialog();
             }
+        }
+
+        private void settingToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            using (var form = new SettingForm())
+            {
+                form.ShowDialog();
+            }
+        }
+        
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            this.RefreshDeviceInformation();
+            if (this.Device.IsReady && this.Device.ConfigFileExists)
+            {
+                if (MessageBox.Show(Resources.ReadConfig, "", MessageBoxButtons.OKCancel) == System.Windows.Forms.DialogResult.OK)
+                {
+                    ReadConfig();
+                }
+            }
+            else
+            {
+                MessageBox.Show(Resources.NotConnected);
+            }
+        }
+
+        private void toolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            this.RefreshDeviceInformation();
+            if (this.Device.IsReady)
+            {
+                if (MessageBox.Show(Resources.WriteConfig, "", MessageBoxButtons.OKCancel) == System.Windows.Forms.DialogResult.OK)
+                {
+                    var fileName = this.Device.ConfigSkriptFilePath;
+                    var script = this.GenerateScript(configurationControl.Setting);
+                    File.WriteAllText(fileName, script);
+                    MessageBox.Show(Resources.SuccessfullySaved);
+                }
+            }
+            else
+            {
+                MessageBox.Show(Resources.NotConnected);
+            }
+        }
+
+        private void toolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
