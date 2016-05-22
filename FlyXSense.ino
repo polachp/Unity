@@ -4,8 +4,9 @@
 
 #define VARIO
 #define GPS
+//#define AIRSPEED
 //#define HELMET
-#define AIRSPEED
+
 //#define TESTCOMPENSTAION
 
 //#define DEBUG
@@ -14,6 +15,7 @@
 //#define DEBUGOUTDATATOSERIAL
 //#define DEBUGCOMPENSATEDCLIMBRATE
 
+#define SERIAL_RX_BUFFER_SIZE 512
 
 #include <SoftwareSerial.h>
 //#include <avr/interrupt.h>
@@ -38,9 +40,15 @@
 
 float actualPressure;
 static Button button;
-static SoftwareSerial softSerial(7, 8); // RX, TX
+static SoftwareSerial softSerial(SOFT_RXPIN, SOFT_TXPIN ); // RX, TX
 static String gpsData = "";
 static String koboData = "";
+#ifdef DEBUG_COMMANDS
+Stream &inputStream = Serial;
+#else
+Stream &inputStream = softSerial;
+#endif
+
 Sounds snd;
 ConfigManager config;
 MS5611 baro(I2C_MS5611_Add);
@@ -63,29 +71,65 @@ unsigned long lastOutupDataTime = 2000;
 
 void setup()
 {
-	softSerial.begin(19200);
+	Serial.end();
+	pinMode(SOFT_RXPIN, INPUT);
+	pinMode(SOFT_TXPIN, OUTPUT);
+
+	//SETUP BUTTON EVENTS
 	button.Configure(BUTTONPIN);
 	button.OnClick = OnClick;
 	button.OnLongPress = OnLongClick;
 	button.OnVLongPress = VLongPress;
 	button.OnDblClick = OnDblClick;
-	actualPressure = 101325;
 
+	//SETUP SENSORS
+	actualPressure = 101325;
 	baro.setup();
 #ifdef AIRSPEED
 	airspd.setup();
 #endif
 
+	//LOAD CONFIG
 	config.LoadConfigToRuntime();
+
 #ifdef HELMET
 	config.SetVarioMode(0);
 	config.data.BaseFreq = 200;
 	config.data.Volume=1;
 	config.data.LiftTreshold = 20;
 	config.data.SinkTreshold  = -1000;
-	baro.varioData.sensitivity = 23;
+	baro.varioData.sensitivity = 35;
 
 #endif
+
+	softSerial.begin(19200);
+	while (millis() < SERIAL_COMM_DELAY){
+		ProcessKobo();
+		if (config.InitSave){
+			config.InitSave=false;
+			break;
+		}
+	}
+
+	softSerial.end();
+
+	//SET GPS COMMUNICATION SPEED
+	softSerial.begin(9600);
+	String cmd = "";
+	cmd = "PMTK251,38400"; //19200	    
+	//cmd.concat(SERIAL_SPEED);
+	send_cmd(softSerial, cmd);
+	softSerial.end(); // we no longer expect configuration to come over serial port on speed 19200
+
+	//SETUP COMMS
+	softSerial.begin(SERIAL_SPEED);
+	Serial.begin(SERIAL_SPEED);
+	softSerial.flush();
+	Serial.flush();
+	koboData="";
+	gpsData= "";
+
+	SetupGps();
 
 #ifdef DEBUG_SOUND
 	config.data.RateMultiplier = 100;
@@ -97,72 +141,48 @@ void setup()
 
 void loop() {
 
+#ifndef DEBUG_COMMANDS
 #ifdef GPS
-	if (!initialized && millis() > SERIAL_COMM_DELAY)
-	{
-		/*softSerial.begin(9600);*/
-		/*String cmd = "";
-		cmd = "PMTK251,19200";
-		send_cmd(softSerial, cmd);*/
-		softSerial.end();
-		softSerial.begin(SERIAL_SPEED);
-		SetupGps();
-		Serial.begin(SERIAL_SPEED);
-		initialized = true;
-		airspd.airSpeedData.airspeedReset = true;
-		//PrintCFG();
-	}
-#else
-	initialized=true;
-#endif
-
+	ProcessGPS();
 	ProcessKobo();
-
-	if (initialized)
-	{
+#endif
+#endif
 #ifdef DEBUG_SOUND
-		//snd.ContinousVarioSound(vario);
-		snd.VarioSound(vario);
+	//snd.ContinousVarioSound(vario);
+	snd.VarioSound(vario);
 #else
 
 #ifdef AIRSPEED
-		if ( dteVario.compensatedClimbRateAvailable && config.data.VarioMode == 1)
-		{
-			snd.VarioSound(dteVario.compensatedClimbRate);
-		}
-		else{
-			snd.VarioSound(baro.varioData.climbRate);
-		}
-#else
+	if ( dteVario.compensatedClimbRateAvailable && config.data.VarioMode == 1)
+	{
+		snd.VarioSound(dteVario.compensatedClimbRate);
+	}
+	else{
 		snd.VarioSound(baro.varioData.climbRate);
+	}
+#else
+	snd.VarioSound(baro.varioData.climbRate);
 #endif // airspeed
-
 #endif // debug sound
 
-		readSensors(); //Executive part that reads all sensor values and process them  
-
-#ifndef DEBUG_COMMANDS
-#ifdef GPS
-		ProcessGPS();
-#endif
-#endif
+	readSensors(); //Executive part that reads all sensor values and process them  
 
 #ifndef HELMET
 #ifdef DEBUGOUTDATATOSERIAL
-		if ((millis() - lastOutupDataTime) > 100)
-		{
-			DebugOutputToSerial();
-			lastOutupDataTime = millis();
-		}
-#else
-		if ((millis() - lastVarioDataTime) > VARIODATASENDINTERVAL)
-		{
-			SendVarioData();
-			lastVarioDataTime = millis();
-		}
-#endif
-#endif
+	if ((millis() - lastOutupDataTime) > 100)
+	{
+		DebugOutputToSerial();
+		lastOutupDataTime = millis();
 	}
+#else
+	if ((millis() - lastVarioDataTime) > VARIODATASENDINTERVAL)
+	{
+		SendVarioData();
+		lastVarioDataTime = millis();
+	}
+#endif
+#endif
+
 	button.CheckBP();
 }// LOOP
 
@@ -225,23 +245,27 @@ void SetupGps(){
 
 	String cmd = "";
 
-	cmd = "PMTK314,0,1,0,1,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0"; //without speed sentences
+	cmd = "PMTK314,0,1,0,1,15,0,0,0,0,0,0,0,0,0,0,0,0,0,0"; //without speed sentences
 	send_cmd(softSerial, cmd);
 
 	cmd = "PMTK225,0"; // power mode
 	send_cmd(softSerial, cmd);
 
-	//cmd = "PMTK313,1"; // SBAS ON
-	//send_cmd(softSerial, cmd);
+	cmd = "PMTK313,1"; // SBAS ON
+	send_cmd(softSerial, cmd);
 
-	//cmd = "PMTK301,2"; //WAAS ENABLED
-	//send_cmd(softSerial, cmd);
+	cmd = "PMTK301,2"; //WAAS ENABLED
+	send_cmd(softSerial, cmd);
+
+	cmd = "PMTK501,2"; // DGPS data source mode: WAAS
+	send_cmd(softSerial, cmd);
 
 	cmd = "PMTK397,0";  // Turn off Navthreshold
 	send_cmd(softSerial, cmd);
 
 	cmd = "PMTK220,500";
 	send_cmd(softSerial, cmd);
+
 }
 
 void wakeUp()
@@ -249,6 +273,7 @@ void wakeUp()
 }
 
 void SleepMode(){
+	snd.SoundDn();
 	cmd = "PMTK161,0";
 	send_cmd(softSerial, cmd);
 	snd.PlayBeeps(80,700,1,0);
@@ -261,26 +286,37 @@ void SleepMode(){
 	config.SetVarioMode(config.data.VarioMode);
 }
 
+// nmea senteces example:
+//$GPGGA,092750.000,5321.6802,N,00630.3372,W,1,8,1.03,61.7,M,55.2,M,,*76
+//$GPGSA,A,3,10,07,05,02,29,04,08,13,,,,,1.72,1.03,1.38*0A
+//$GPGSV,3,1,11,10,63,137,17,07,61,098,15,05,59,290,20,08,54,157,30*70
+//$GPGSV,3,2,11,02,39,223,19,13,28,070,17,26,23,252,,04,14,186,14*79
+//$GPGSV,3,3,11,29,09,301,24,16,09,020,,36,,,*76
+//$GPRMC,092750.000,A,5321.6802,N,00630.3372,W,0.02,31.66,280511,,,A*43
 void ProcessGPS()
 {
-	while (Serial.available() > 0)
+	while (Serial.available())
 	{
 		char in = Serial.read();
-		if (in == '$') {
+		if (in == '\n') {
 			Serial.println(gpsData);
-			gpsData = "$";
+			gpsData = "";
 		}
-		else if (in != '\n') {
+		else {
 			gpsData.concat(in);
 		}
+
+		/*char in = Serial.read();
+		if (in == '$') {
+		Serial.println(gpsData);
+		gpsData = "$";
+		}
+		else if (in != '\n') {
+		gpsData.concat(in);
+		}*/
 	}
 }
 
-#ifdef DEBUG_COMMANDS
-Stream &inputStream = Serial;
-#else
-Stream &inputStream = softSerial;
-#endif
 void ProcessKobo()
 {
 	while (inputStream.available() > 0)
@@ -392,15 +428,9 @@ void VLongPress(int pin)
 	return;
 #endif
 
-#ifdef AIRSPEED
-	//airspeeed sensor for proper null airspeed
-	snd.SoundUp();
-	snd.SoundDn();
-	airspd.airSpeedData.airspeedReset = true;
-	return;
-#else
 	SleepMode(); 
-	return;
+#ifdef AIRSPEED
+	airspd.airSpeedData.airspeedReset = true;
 #endif
 }
 
@@ -444,46 +474,46 @@ void DebugOutputToSerial()
 	//Serial.print( baro.varioData.temperature/100.0);
 }
 #endif // OutputToSerial
-//
-//void PrintCFG()
-//{
-//	Serial.print("schema:");
-//	Serial.println(config.data.SchemaVersion);
-//
-//	Serial.print("mode:");
-//	Serial.println(config.data.VarioMode);
-//
-//	Serial.print("soundon:");
-//	Serial.println(config.data.SoundOn);
-//
-//	Serial.print("basefreq:");
-//	Serial.println(config.data.BaseFreq);
-//
-//	Serial.print("lowbasefreq:");
-//	Serial.println(config.data.LowBaseFreq);
-//
-//	Serial.print("LowSoundVolume:");
-//	Serial.println(config.data.LowSoundVolume);
-//
-//	Serial.print("Volume:");
-//	Serial.println(config.data.Volume);
-//
-//	Serial.print("LiftTreshold:");
-//	Serial.println(config.data.LiftTreshold);
-//
-//	Serial.print("SinkTreshold:");
-//	Serial.println(config.data.SinkTreshold);
-//
-//	Serial.print("Beeprate:");
-//	Serial.println(config.data.RateMultiplier);
-//
-//	Serial.print("Sensitivity:");
-//	Serial.println(config.data.Sensitivity);
-//
-//	Serial.print("Compensation:");
-//	Serial.println(config.data.Compesation);
-//	Serial.print("SpeedCalibrationA:");
-//	Serial.println(config.data.SpeedCalibrationA);
-//	Serial.print("SpeedCalibrationB:");
-//	Serial.println(config.data.SpeedCalibrationB);
-//}
+
+void PrintCFG()
+{
+	Serial.print("schema:");
+	Serial.println(config.data.SchemaVersion);
+
+	Serial.print("mode:");
+	Serial.println(config.data.VarioMode);
+
+	Serial.print("soundon:");
+	Serial.println(config.data.SoundOn);
+
+	Serial.print("basefreq:");
+	Serial.println(config.data.BaseFreq);
+
+	Serial.print("lowbasefreq:");
+	Serial.println(config.data.LowBaseFreq);
+
+	Serial.print("LowSoundVolume:");
+	Serial.println(config.data.LowSoundVolume);
+
+	Serial.print("Volume:");
+	Serial.println(config.data.Volume);
+
+	Serial.print("LiftTreshold:");
+	Serial.println(config.data.LiftTreshold);
+
+	Serial.print("SinkTreshold:");
+	Serial.println(config.data.SinkTreshold);
+
+	Serial.print("Beeprate:");
+	Serial.println(config.data.RateMultiplier);
+
+	Serial.print("Sensitivity:");
+	Serial.println(config.data.Sensitivity);
+
+	Serial.print("Compensation:");
+	Serial.println(config.data.Compesation);
+	Serial.print("SpeedCalibrationA:");
+	Serial.println(config.data.SpeedCalibrationA);
+	Serial.print("SpeedCalibrationB:");
+	Serial.println(config.data.SpeedCalibrationB);
+}

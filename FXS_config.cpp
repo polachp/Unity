@@ -5,7 +5,7 @@ extern void SleepMode();
 
 ConfigManager::ConfigManager()
 {
-
+	InitSave = false;
 }
 
 void ConfigManager::Load()
@@ -20,6 +20,7 @@ void ConfigManager::Load()
 void ConfigManager::Save()
 {
 	EEPROM_writeAnything(0, data);
+	InitSave=true;
 }
 
 void ConfigManager::SetVarioMode(byte m)
@@ -30,14 +31,14 @@ void ConfigManager::SetVarioMode(byte m)
 #ifndef AIRSPEED
 		snd.X = 400;
 #endif
-		snd.PlayBeeps(500,80,3,10);
+		snd.PlayBeeps(800,60,4,10);
 	}else{
 #ifndef AIRSPEED
 		snd.X = 1000;
 #endif
-		snd.PlayBeeps(400,160,3,10);
+		snd.PlayBeeps(800,200,2,10);
 	}
-	Save();
+	Save();  
 }
 
 int MapSensitivity(int sen)
@@ -49,9 +50,17 @@ void ConfigManager::LoadConfigToRuntime()
 {
 	Load();
 	baro.varioData.sensitivity = MapSensitivity(data.Sensitivity);
-	snd.SoundOn = true;
+	
+	//sounds
+	snd.SoundOn = data.SoundOn;
 	snd.Volume = data.Volume;
-	if (snd.Volume<10) snd.BaseFreq = data.LowBaseFreq; // in case of lower sount than max we use lower base freq mode
+	if (snd.Volume<10) 
+	{
+		snd.BaseFreq = data.LowBaseFreq; // in case of lower sount than max we use lower base freq mode
+	}else{
+		snd.BaseFreq = data.BaseFreq;
+	}
+
 #ifdef AIRSPEED
 	airspd.setCalibration(data.SpeedCalibrationA,data.SpeedCalibrationB);  
 #endif

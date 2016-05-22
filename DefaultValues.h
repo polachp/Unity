@@ -22,7 +22,7 @@
 #define ALARMS_VOLUME 10
 #define LOWSOUNDVOLUME 9 // low sound volume. High sound volume uses 10 by default
 #define DEFAULTSOUNDBASEFREQ 2700 // base sound frequency
-#define DEFAULTLOWSOUNDBASEFREQ 500 // base sound frequency for low sound mode
+#define DEFAULTLOWSOUNDBASEFREQ 550 // base sound frequency for low sound mode
 #define DEFAULT_SOUND_RATE_MULTIPLIER 100 // sound beep speed coeff (use 0.5-1.5)
 #define FREQ_RAISE 600 //frequency raises from basefreq up to basefreq + FREQ_RAISE on vario value 0-8
 
@@ -30,7 +30,7 @@
 
 #define SOUNDPIN1    9
 #define SOUNDPIN2    10
-#define SERIAL_SPEED 9600
+#define SERIAL_SPEED 38400
 #define I2C_MS5611_Add 0x77
 #define I2C_4525_Add   0x28
 #define SOUNDPIN    5
@@ -39,6 +39,8 @@
 #define I2C_4525_Add   0x28
 #define PIN_LED        13 
 
+#define SOFT_RXPIN 7
+#define SOFT_TXPIN 8 
 #ifdef DEBUG
 #define SERIAL_COMM_DELAY 50  // 12 seconds
 #else
