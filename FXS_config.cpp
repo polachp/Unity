@@ -20,7 +20,7 @@ void ConfigManager::Load()
 void ConfigManager::Save()
 {
 	EEPROM_writeAnything(0, data);
-	InitSave=true;
+
 }
 
 void ConfigManager::SetVarioMode(byte m)
@@ -228,6 +228,7 @@ void ConfigManager::ProcessSetCommand(String sentence)
 		snd.Volume = data.AlarmsVolume;
 		snd.PlayLKSound(GetValue(sentence));
 		snd.Volume = lastVolume;
+		InitSave = true;
 		return;
 	}
 

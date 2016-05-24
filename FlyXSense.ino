@@ -15,7 +15,7 @@
 //#define DEBUGOUTDATATOSERIAL
 //#define DEBUGCOMPENSATEDCLIMBRATE
 
-#define SERIAL_RX_BUFFER_SIZE 512
+#define SERIAL_RX_BUFFER_SIZE 256
 
 #include <SoftwareSerial.h>
 //#include <avr/interrupt.h>
@@ -40,8 +40,7 @@
 
 float actualPressure;
 static Button button;
-static SoftwareSerial softSerial(SOFT_RXPIN, SOFT_TXPIN ); // RX, TX
-static String gpsData = "";
+static SoftwareSerial softSerial(SOFT_RXPIN, SOFT_TXPIN); // RX, TX
 static String koboData = "";
 #ifdef DEBUG_COMMANDS
 Stream &inputStream = Serial;
@@ -64,13 +63,14 @@ static FXS_CompensatedVario dteVario;
 int vario = 0;
 #endif
 //loop timers
-static unsigned long lastVarioDataTime = 5000;
+static unsigned long NextVariDataUpdate = 5000;
 #ifdef DEBUGOUTDATATOSERIAL
 unsigned long lastOutupDataTime = 2000;
 #endif
 
 void setup()
 {
+	
 	Serial.end();
 	pinMode(SOFT_RXPIN, INPUT);
 	pinMode(SOFT_TXPIN, OUTPUT);
@@ -105,29 +105,25 @@ void setup()
 	softSerial.begin(19200);
 	while (millis() < SERIAL_COMM_DELAY){
 		ProcessKobo();
-		if (config.InitSave){
-			config.InitSave=false;
-			break;
-		}
 	}
 
 	softSerial.end();
 
-	//SET GPS COMMUNICATION SPEED
-	softSerial.begin(9600);
-	String cmd = "";
-	cmd = "PMTK251,38400"; //19200	    
-	//cmd.concat(SERIAL_SPEED);
-	send_cmd(softSerial, cmd);
-	softSerial.end(); // we no longer expect configuration to come over serial port on speed 19200
+	////SET GPS COMMUNICATION SPEED
+	//softSerial.begin(9600);
+	//String cmd = "";
+	//cmd = "PMTK251,9600"; //19200 //38400	    
+	////cmd.concat(SERIAL_SPEED);
+	//send_cmd(softSerial, cmd);
+	//softSerial.end(); // we no longer expect configuration to come over serial port on speed 19200
 
 	//SETUP COMMS
 	softSerial.begin(SERIAL_SPEED);
 	Serial.begin(SERIAL_SPEED);
-	softSerial.flush();
-	Serial.flush();
-	koboData="";
-	gpsData= "";
+	while (Serial.available())
+		if (Serial.read() == '\r')
+			break;
+	koboData = "";
 
 	SetupGps();
 
@@ -139,12 +135,29 @@ void setup()
 #endif
 }
 
+char in;
 void loop() {
 
 #ifndef DEBUG_COMMANDS
 #ifdef GPS
-	ProcessGPS();
-	ProcessKobo();
+	/*ProcessGPS();*/
+	while (Serial.available())
+	{
+		in = Serial.read();
+		if ((in != '\n' && in != '\r')) {
+			if (in == '$'){ 
+				Serial.println(""); //
+				if ((millis() > NextVariDataUpdate))
+				{
+					SendVarioData();
+					NextVariDataUpdate = millis() + VARIODATASENDINTERVAL;
+				}
+			}
+			Serial.print(in);
+		}
+
+	}
+
 #endif
 #endif
 #ifdef DEBUG_SOUND
@@ -153,7 +166,7 @@ void loop() {
 #else
 
 #ifdef AIRSPEED
-	if ( dteVario.compensatedClimbRateAvailable && config.data.VarioMode == 1)
+	if (dteVario.compensatedClimbRateAvailable && config.data.VarioMode == 1)
 	{
 		snd.VarioSound(dteVario.compensatedClimbRate);
 	}
@@ -167,22 +180,7 @@ void loop() {
 
 	readSensors(); //Executive part that reads all sensor values and process them  
 
-#ifndef HELMET
-#ifdef DEBUGOUTDATATOSERIAL
-	if ((millis() - lastOutupDataTime) > 100)
-	{
-		DebugOutputToSerial();
-		lastOutupDataTime = millis();
-	}
-#else
-	if ((millis() - lastVarioDataTime) > VARIODATASENDINTERVAL)
-	{
-		SendVarioData();
-		lastVarioDataTime = millis();
-	}
-#endif
-#endif
-
+	ProcessKobo();
 	button.CheckBP();
 }// LOOP
 
@@ -199,34 +197,47 @@ void loop() {
 //// 11 windspeed [km/h] (not used in LX1600)
 ////
 //// e.g.:
-//// $LXWP0,Y,222.3,1665.5,1.71,,,,,,239,174,10.1
+//// $LXWP0,Y,260.0,723.6,-24.62,,,,,,210,012,4.9*5C
+
+
+
 void SendVarioData()
 {
 #ifndef DEBUGOUTDATATOSERIAL
 	static String varioData = "";
-	varioData = "LXWP0,N,";
+	varioData = "LXWP0,Y,";
 #ifdef AIRSPEED
 	varioData.concat(airspd.airSpeedData.airSpeedSM * 3.6 / 100);
 #endif
 	varioData.concat(",");
-	varioData.concat(baro.varioData.absoluteAlt / 100);
-	varioData.concat(",,,,,,");
-#ifdef AIRSPEED
-	if (dteVario.compensatedClimbRateAvailable && config.data.VarioMode == 1)
+	varioData.concat(baro.varioData.absoluteAlt / 100.f);
+	varioData.concat(",");
+	for (int i = 1; i <= 6; i++)
 	{
-		varioData.concat(dteVario.compensatedClimbRateSM / 100.0f);
+		varioData.concat(GetVarioValueForExport());  
+		varioData.concat(",");
 	}
-	else{
-		varioData.concat(baro.varioData.climbRateSM / 100.0f);
-	}
-#else
-	//varioData.concat(vario/100.0f);
-	varioData.concat(baro.varioData.climbRateSM / 100.0f);
-#endif
-	varioData.concat(",,,,");
+	varioData.concat(",,");
 	send_cmd(Serial, varioData);
 #endif //DEBUGOUTDATATOSERIAL
 }
+
+float GetVarioValueForExport()
+{
+#ifdef AIRSPEED
+	if (dteVario.compensatedClimbRateAvailable && config.data.VarioMode == 1)
+	{
+		return dteVario.compensatedClimbRateSM / 100.0f;
+	}
+	else{
+		return baro.varioData.climbRateSM / 100.0f;
+	}
+#else
+	//varioData.concat(vario/100.0f);
+	return baro.varioData.climbRateSM / 100.0f;
+#endif
+}
+
 
 void send_cmd(Stream &icf, String &cmd) {
 	static unsigned int checksum_end, ai, bi;                                               // Calculating checksum for data string
@@ -244,8 +255,8 @@ void send_cmd(Stream &icf, String &cmd) {
 void SetupGps(){
 
 	String cmd = "";
-
-	cmd = "PMTK314,0,1,0,1,15,0,0,0,0,0,0,0,0,0,0,0,0,0,0"; //without speed sentences
+	//////"PMTK314,0,1,2,3,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0"
+	cmd = "PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"; //without speed sentences
 	send_cmd(softSerial, cmd);
 
 	cmd = "PMTK225,0"; // power mode
@@ -276,45 +287,14 @@ void SleepMode(){
 	snd.SoundDn();
 	cmd = "PMTK161,0";
 	send_cmd(softSerial, cmd);
-	snd.PlayBeeps(80,700,1,0);
+	snd.PlayBeeps(80, 700, 1, 0);
 	delay(1000);
-	attachInterrupt(0,wakeUp, LOW);
-	LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF); 
-	detachInterrupt(0); 
+	attachInterrupt(0, wakeUp, LOW);
+	LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
+	detachInterrupt(0);
 	cmd = "wake";
 	send_cmd(softSerial, cmd);
 	config.SetVarioMode(config.data.VarioMode);
-}
-
-// nmea senteces example:
-//$GPGGA,092750.000,5321.6802,N,00630.3372,W,1,8,1.03,61.7,M,55.2,M,,*76
-//$GPGSA,A,3,10,07,05,02,29,04,08,13,,,,,1.72,1.03,1.38*0A
-//$GPGSV,3,1,11,10,63,137,17,07,61,098,15,05,59,290,20,08,54,157,30*70
-//$GPGSV,3,2,11,02,39,223,19,13,28,070,17,26,23,252,,04,14,186,14*79
-//$GPGSV,3,3,11,29,09,301,24,16,09,020,,36,,,*76
-//$GPRMC,092750.000,A,5321.6802,N,00630.3372,W,0.02,31.66,280511,,,A*43
-void ProcessGPS()
-{
-	while (Serial.available())
-	{
-		char in = Serial.read();
-		if (in == '\n') {
-			Serial.println(gpsData);
-			gpsData = "";
-		}
-		else {
-			gpsData.concat(in);
-		}
-
-		/*char in = Serial.read();
-		if (in == '$') {
-		Serial.println(gpsData);
-		gpsData = "$";
-		}
-		else if (in != '\n') {
-		gpsData.concat(in);
-		}*/
-	}
 }
 
 void ProcessKobo()
@@ -327,7 +307,8 @@ void ProcessKobo()
 			config.ProcessSetCommand(koboData);
 			koboData = "";
 		}
-		else if (in != '\n') {
+		else if (in != '\n' && in != '\r')
+		{
 			koboData.concat(in);
 		}
 	}
@@ -394,12 +375,12 @@ void OnClick(int pin)
 	{
 		snd.Volume = config.data.LowSoundVolume;
 		snd.BaseFreq = config.data.LowBaseFreq;
-		snd.PlayBeeps( config.data.LowBaseFreq,160,2,20);
+		snd.PlayBeeps(config.data.LowBaseFreq, 160, 2, 20);
 	}
 	else{
 		snd.Volume = 10;
 		snd.BaseFreq = config.data.BaseFreq;
-		snd.PlayBeeps( config.data.BaseFreq,160,2,20);
+		snd.PlayBeeps(config.data.BaseFreq, 160, 2, 20);
 	}
 
 	config.data.Volume = snd.Volume;
@@ -411,7 +392,6 @@ void OnLongClick(int pin)
 	if (config.data.VarioMode == 1)
 	{
 		config.SetVarioMode(0);
-
 	}
 	else{
 		config.SetVarioMode(1);
@@ -423,12 +403,12 @@ void VLongPress(int pin)
 #ifdef TESTCOMPENSTAION
 	if (config.data.Compesation >= 140) config.data.Compesation = 70;
 	config.data.Compesation += 10;
-	snd.PlayBeeps(1000,80, config.data.Compesation/10-7,160);
+	snd.PlayBeeps(1000, 80, config.data.Compesation / 10 - 7, 160);
 	config.Save();
 	return;
 #endif
 
-	SleepMode(); 
+	SleepMode();
 #ifdef AIRSPEED
 	airspd.airSpeedData.airspeedReset = true;
 #endif
@@ -475,45 +455,45 @@ void DebugOutputToSerial()
 }
 #endif // OutputToSerial
 
-void PrintCFG()
-{
-	Serial.print("schema:");
-	Serial.println(config.data.SchemaVersion);
-
-	Serial.print("mode:");
-	Serial.println(config.data.VarioMode);
-
-	Serial.print("soundon:");
-	Serial.println(config.data.SoundOn);
-
-	Serial.print("basefreq:");
-	Serial.println(config.data.BaseFreq);
-
-	Serial.print("lowbasefreq:");
-	Serial.println(config.data.LowBaseFreq);
-
-	Serial.print("LowSoundVolume:");
-	Serial.println(config.data.LowSoundVolume);
-
-	Serial.print("Volume:");
-	Serial.println(config.data.Volume);
-
-	Serial.print("LiftTreshold:");
-	Serial.println(config.data.LiftTreshold);
-
-	Serial.print("SinkTreshold:");
-	Serial.println(config.data.SinkTreshold);
-
-	Serial.print("Beeprate:");
-	Serial.println(config.data.RateMultiplier);
-
-	Serial.print("Sensitivity:");
-	Serial.println(config.data.Sensitivity);
-
-	Serial.print("Compensation:");
-	Serial.println(config.data.Compesation);
-	Serial.print("SpeedCalibrationA:");
-	Serial.println(config.data.SpeedCalibrationA);
-	Serial.print("SpeedCalibrationB:");
-	Serial.println(config.data.SpeedCalibrationB);
-}
+//void PrintCFG()
+//{
+//	Serial.print("schema:");
+//	Serial.println(config.data.SchemaVersion);
+//
+//	Serial.print("mode:");
+//	Serial.println(config.data.VarioMode);
+//
+//	Serial.print("soundon:");
+//	Serial.println(config.data.SoundOn);
+//
+//	Serial.print("basefreq:");
+//	Serial.println(config.data.BaseFreq);
+//
+//	Serial.print("lowbasefreq:");
+//	Serial.println(config.data.LowBaseFreq);
+//
+//	Serial.print("LowSoundVolume:");
+//	Serial.println(config.data.LowSoundVolume);
+//
+//	Serial.print("Volume:");
+//	Serial.println(config.data.Volume);
+//
+//	Serial.print("LiftTreshold:");
+//	Serial.println(config.data.LiftTreshold);
+//
+//	Serial.print("SinkTreshold:");
+//	Serial.println(config.data.SinkTreshold);
+//
+//	Serial.print("Beeprate:");
+//	Serial.println(config.data.RateMultiplier);
+//
+//	Serial.print("Sensitivity:");
+//	Serial.println(config.data.Sensitivity);
+//
+//	Serial.print("Compensation:");
+//	Serial.println(config.data.Compesation);
+//	Serial.print("SpeedCalibrationA:");
+//	Serial.println(config.data.SpeedCalibrationA);
+//	Serial.print("SpeedCalibrationB:");
+//	Serial.println(config.data.SpeedCalibrationB);
+//}

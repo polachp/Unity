@@ -26,11 +26,11 @@
 #define DEFAULT_SOUND_RATE_MULTIPLIER 100 // sound beep speed coeff (use 0.5-1.5)
 #define FREQ_RAISE 600 //frequency raises from basefreq up to basefreq + FREQ_RAISE on vario value 0-8
 
-#define VARIODATASENDINTERVAL 500
+#define VARIODATASENDINTERVAL 350
 
 #define SOUNDPIN1    9
 #define SOUNDPIN2    10
-#define SERIAL_SPEED 38400
+#define SERIAL_SPEED 9600 //38400
 #define I2C_MS5611_Add 0x77
 #define I2C_4525_Add   0x28
 #define SOUNDPIN    5
