@@ -37,7 +37,6 @@ class ConfigManager
 public:
 	ConfigManager();
 	Configuration data;
-	bool InitSave;
 	void SetDefaults();
 	void LoadConfigToRuntime();
 	void ProcessSetCommand(String cmd);
