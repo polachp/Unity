@@ -4,7 +4,7 @@
 
 #define VARIO
 #define GPS
-//#define AIRSPEED
+#define AIRSPEED
 //#define HELMET
 
 //#define TESTCOMPENSTAION
@@ -155,7 +155,6 @@ void loop() {
 			}
 			Serial.print(in);
 		}
-
 	}
 
 #endif
@@ -274,7 +273,7 @@ void SetupGps(){
 	cmd = "PMTK397,0";  // Turn off Navthreshold
 	send_cmd(softSerial, cmd);
 
-	cmd = "PMTK220,500";
+	cmd = "PMTK220,1000";
 	send_cmd(softSerial, cmd);
 
 }
