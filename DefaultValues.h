@@ -1,18 +1,18 @@
 #ifndef DEFAULTVALUES_h
 #define DEFAULTVALUES_h
 
-#define SCHEMAVERSION 20
+#define SCHEMAVERSION 25
 
 //Hardcoded defaults
 #define SENSITIVITY_MIN 35  // mapped 30-100!!
 
 #define SMOOTHING_DTE_MIN 35 // non mapped
-#define SMOOTHING_DTE_MAX 80
+#define SMOOTHING_DTE_MAX 60
 #define SMOOTHING_DTE_MIN_AT 100
 #define SMOOTHING_DTE_MAX_AT 1000
-#define COMPENSATION 100
+#define COMPENSATION 65
 
-#define DEFAULT_LIFT_TRESHOLD 15
+#define DEFAULT_LIFT_TRESHOLD 10
 #define DEFAULT_SINK_TRESHOLD -250
 
 #define SPEEDCALIBRATION_A 95
@@ -21,8 +21,8 @@
 //SOUND DEFINITIONS
 #define ALARMS_VOLUME 10
 #define LOWSOUNDVOLUME 9 // low sound volume. High sound volume uses 10 by default
-#define DEFAULTSOUNDBASEFREQ 2700 // base sound frequency
-#define DEFAULTLOWSOUNDBASEFREQ 550 // base sound frequency for low sound mode
+#define DEFAULTSOUNDBASEFREQ 2800 // base sound frequency
+#define DEFAULTLOWSOUNDBASEFREQ 800 // base sound frequency for low sound mode
 #define DEFAULT_SOUND_RATE_MULTIPLIER 100 // sound beep speed coeff (use 0.5-1.5)
 #define FREQ_RAISE 600 //frequency raises from basefreq up to basefreq + FREQ_RAISE on vario value 0-8
 

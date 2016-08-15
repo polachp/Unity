@@ -129,7 +129,7 @@ void ConfigManager::ProcessSetCommand(String sentence)
 	if (Contains(sentence, "UNCMP"))
 	{
 		value = GetValue(sentence);
-		data.Compesation = constrain(value, 80, 140);
+		data.Compesation = constrain(value, 50, 100);
 		return;
 	}
 
